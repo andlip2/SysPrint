@@ -1,139 +1,142 @@
-import os
-import time
 import csv
-from datetime import datetime
+import os
 from sqlalchemy import create_engine, text
-import win32serviceutil
-import win32service
-import win32api
-import win32con
-import logging
-import threading
+from datetime import datetime
 
-class PaperCutService(win32serviceutil.ServiceFramework):
-    _svc_name_ = 'PaperCutService'
-    _svc_display_name_ = 'PaperCut Log Monitoring Service'
-    _svc_description_ = 'Monitora o arquivo de log do PaperCut e envia os dados para o banco de dados.'
+# URL de conexão com o banco
+db_url = "mysql+pymysql://root:@localhost:3306/teste_rc"
+engine = create_engine(db_url)
 
-    def __init__(self, args):
-        super().__init__(args)
-        self.db_url = "mysql+pymysql://root:@localhost:3306/teste_rc"  # Conexão corrigida, sem senha ou com a senha adequada
-        self.db_engine = create_engine(self.db_url)
-        self.log_file_path = r"C:\\Program Files (x86)\\PaperCut Print Logger\\logs\\csv\\papercut-print-log-all-time.csv"
-        self.last_checked_time = datetime.now()
+# Caminho do arquivo CSV
+csv_file_path = r"C:\\Program Files (x86)\\PaperCut Print Logger\\logs\\csv\\papercut-print-log-all-time.csv"
 
-    def create_table(self):
-        """Cria a tabela no banco de dados se ela não existir."""
-        create_table_query = """
-        CREATE TABLE IF NOT EXISTS logs (
-            Time DATETIME,
-            User VARCHAR(255),
-            Pages INT,
-            Copies INT,
-            Printer VARCHAR(255),
-            DocumentName VARCHAR(255),
-            Client VARCHAR(255),
-            PaperSize VARCHAR(50),
-            Language VARCHAR(50),
-            Height FLOAT,
-            Width FLOAT,
-            Duplex BOOLEAN,
-            Grayscale BOOLEAN,
-            Size FLOAT
-        ) ENGINE=InnoDB;
-        """
-        try:
-            with self.db_engine.connect() as connection:
-                connection.execute(text(create_table_query))
-                print("Tabela criada ou já existente.")
-        except Exception as e:
-            print(f"Erro ao criar a tabela: {e}")
+# Verificar se o arquivo existe no caminho fornecido
+if not os.path.isfile(csv_file_path):
+    print(f"Erro: O arquivo {csv_file_path} não foi encontrado.")
+else:
+    print(f"Arquivo encontrado: {csv_file_path}")
 
-    def read_and_store_logs(self):
-        """Lê o arquivo CSV de log e armazena os dados no banco de dados."""
-        try:
-            with open(self.log_file_path, 'r', newline='', encoding='utf-8') as file:
-                csv_reader = csv.reader(file)
-                next(csv_reader)  # Pula o cabeçalho
-                next(csv_reader)  # Pula a segunda linha, conforme solicitado
-                for row in csv_reader:
-                    if len(row) >= 12:  # Verifica se há dados suficientes na linha
-                        time_str = row[0]
-                        user = row[1]
-                        pages = int(row[2]) if row[2].isdigit() else 0
-                        copies = int(row[3]) if row[3].isdigit() else 0
-                        printer = row[4]
-                        document_name = row[5]
-                        client = row[6]
-                        paper_size = row[7]
-                        language = row[8]
-                        height = float(row[9]) if row[9].replace('.', '', 1).isdigit() else 0
-                        width = float(row[10]) if row[10].replace('.', '', 1).isdigit() else 0
-                        duplex = True if row[11].lower() == 'true' else False
-                        grayscale = True if row[10].lower() == 'true' else False
-                        size = float(row[11]) if row[11].replace('.', '', 1).isdigit() else 0
+def create_table():
+    """Cria a tabela no banco de dados com uma chave primária para evitar duplicidade."""
+    create_table_query = """
+    CREATE TABLE IF NOT EXISTS logs (
+        Time DATETIME,
+        User VARCHAR(255),
+        Pages INT,
+        Copies INT,
+        Printer VARCHAR(255),
+        DocumentName VARCHAR(255),
+        Client VARCHAR(255),
+        PaperSize VARCHAR(50),
+        Language VARCHAR(50),
+        Duplex VARCHAR(20),
+        Grayscale VARCHAR(20),
+        Size FLOAT,
+        PRIMARY KEY (Time, User, DocumentName)
+    ) ENGINE=InnoDB;
+    """
+    try:
+        with engine.connect() as connection:
+            print("Tentando criar a tabela...")
+            connection.execute(text(create_table_query))
+            print("Tabela criada ou já existente.")
+    except Exception as e:
+        print(f"Erro ao criar a tabela: {e}")
 
-                        # Converter o tempo para formato de data/hora
-                        log_time = datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S')
+def insert_data_from_csv():
+    """Lê o arquivo CSV e insere os dados no banco de dados, evitando duplicidade."""
+    try:
+        with engine.connect() as connection:
+            # Garantir que a transação será comprometida
+            transaction = connection.begin()
 
-                        insert_query = """
-                        INSERT INTO logs (Time, User, Pages, Copies, Printer, DocumentName, Client, PaperSize, Language, Height, Width, Duplex, Grayscale, Size)
-                        VALUES (:Time, :User, :Pages, :Copies, :Printer, :DocumentName, :Client, :PaperSize, :Language, :Height, :Width, :Duplex, :Grayscale, :Size)
-                        """
-                        with self.db_engine.connect() as connection:
-                            connection.execute(text(insert_query), {
-                                'Time': log_time,
-                                'User': user,
-                                'Pages': pages,
-                                'Copies': copies,
-                                'Printer': printer,
-                                'DocumentName': document_name,
-                                'Client': client,
-                                'PaperSize': paper_size,
-                                'Language': language,
-                                'Height': height,
-                                'Width': width,
-                                'Duplex': duplex,
-                                'Grayscale': grayscale,
-                                'Size': size
-                            })
-                            print(f"Log {log_time} armazenado com sucesso.")
-        except Exception as e:
-            print(f"Erro ao ler o arquivo de log ou armazenar os dados: {e}")
+            try:
+                with open(csv_file_path, mode='r', encoding='latin1') as file:  # Usando encoding latin1
+                    reader = csv.reader(file)
+                    
+                    # Ignorar as duas primeiras linhas
+                    next(reader)  # Primeira linha (cabeçalho ou dados irrelevantes)
+                    next(reader)  # Segunda linha
+                    
+                    for row in reader:
+                        if row:  # Verifica se a linha não está vazia
+                            # Limitar aos primeiros 12 campos
+                            data = row[:12]  # Pega apenas os 12 primeiros campos
+                            
+                            # Verificar se a linha tem o número de campos esperado
+                            if len(data) == 12:
+                                # Extração de dados da linha
+                                time = data[0]
+                                user = data[1]
+                                pages = int(data[2]) if data[2].isdigit() else 0
+                                copies = int(data[3]) if data[3].isdigit() else 0
+                                printer = data[4]
+                                document_name = data[5]
+                                client = data[6]
+                                paper_size = data[7]
+                                language = data[8]
+                                duplex = data[9]  # Mantém como string
+                                grayscale = data[10]  # Mantém como string
+                                
+                                # Tentar processar o tamanho; tratar campos inválidos
+                                try:
+                                    size = float(data[11].replace('kb', '').strip()) if 'kb' in data[11] else 0.0
+                                except ValueError:
+                                    size = 0.0
+                                
+                                # Conversão de time para datetime
+                                try:
+                                    time = datetime.strptime(time, '%Y-%m-%d %H:%M:%S')  # Ajuste o formato conforme necessário
+                                except ValueError:
+                                    time = None
+                                
+                                # Verificar se o registro já existe
+                                select_query = """
+                                SELECT COUNT(*) FROM logs
+                                WHERE Time = :time AND User = :user AND DocumentName = :document_name
+                                """
+                                result = connection.execute(text(select_query), {
+                                    'time': time,
+                                    'user': user,
+                                    'document_name': document_name
+                                }).scalar()
+                                
+                                if result == 0:  # Insere apenas se não existir
+                                    insert_query = """
+                                    INSERT INTO logs (Time, User, Pages, Copies, Printer, DocumentName, Client, PaperSize, Language, Duplex, Grayscale, Size)
+                                    VALUES (:time, :user, :pages, :copies, :printer, :document_name, :client, :paper_size, :language, :duplex, :grayscale, :size)
+                                    """
+                                    connection.execute(text(insert_query), {
+                                        'time': time,
+                                        'user': user,
+                                        'pages': pages,
+                                        'copies': copies,
+                                        'printer': printer,
+                                        'document_name': document_name,
+                                        'client': client,
+                                        'paper_size': paper_size,
+                                        'language': language,
+                                        'duplex': duplex,
+                                        'grayscale': grayscale,
+                                        'size': size
+                                    })
+                                    print(f"Dados inseridos para o documento: {document_name}")
+                                else:
+                                    print(f"Registro duplicado ignorado: {document_name}")
+                            else:
+                                print(f"Erro: A linha não contém dados suficientes (menos de 12 campos). Linha: {row}")
+                
+                # Commit da transação
+                transaction.commit()
+                print("Todos os dados foram inseridos com sucesso.")
+            except Exception as e:
+                transaction.rollback()  # Reverter em caso de erro
+                raise e
+    except Exception as e:
+        print(f"Erro ao processar o arquivo CSV ou inserir dados: {e}")
 
-    def monitor_logs(self):
-        """Monitora o arquivo de log continuamente e envia os dados para o banco de dados."""
-        self.create_table()  # Cria a tabela no banco de dados se necessário
-        while True:
-            current_time = datetime.now()
-            # Verificar se passou tempo suficiente para processar os novos logs
-            if (current_time - self.last_checked_time).seconds >= 60:  # Processa a cada minuto
-                self.read_and_store_logs()
-                self.last_checked_time = current_time
-            time.sleep(10)
+# Criação da tabela no banco de dados
+create_table()
 
-    def SvcStop(self):
-        """Para o serviço."""
-        self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
-        print("Serviço de monitoramento parado.")
-        self.Stop()
-
-    def SvcDoRun(self):
-        """Inicia o serviço."""
-        print("Serviço de monitoramento iniciado.")
-        log_thread = threading.Thread(target=self.monitor_logs)
-        log_thread.daemon = True
-        log_thread.start()
-        self.wait_for_service_to_stop()
-
-    def wait_for_service_to_stop(self):
-        """Aguarda o serviço ser parado."""
-        try:
-            while True:
-                time.sleep(1)
-        except KeyboardInterrupt:
-            print("Serviço interrompido manualmente.")
-            self.SvcStop()
-
-if __name__ == '__main__':
-    win32serviceutil.HandleCommandLine(PaperCutService)
+# Inserir dados do arquivo CSV no banco de dados
+insert_data_from_csv()
