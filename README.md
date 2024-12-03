@@ -1,3 +1,6 @@
+> \[!NOTE]
+> Esta é uma branch secundária com uma versão alternativa do projeto.
+
 # SysPrint
 
 `SysPrint` é um sistema que monitora e registra a quantidade de páginas impressas por computador na empresa.
