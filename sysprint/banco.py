@@ -12,12 +12,16 @@ def conexao_banco():
 
 def inserir_dados(conn, df):
     cursor = conn.cursor()
+
     query = (
         "INSERT INTO print_logs (`Time`, `User`, `Pages`, `Copies`, "
         "`Printer`, `Document Name`, `Client`, `Paper Size`, `Language`, "
         "`Duplex`, `Grayscale`, `Size`) "
         "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
     )
+
+    check_query = "SELECT COUNT(*) FROM print_logs WHERE `Time` = %s AND `User` = %s"
+
     for _, row in df.iterrows():
         data = (
             row["Time"],
@@ -34,5 +38,13 @@ def inserir_dados(conn, df):
             row["Size"],
         )
 
-        cursor.execute(query, data)
+        cursor.execute(check_query, (row["Time"], row["User"]))
+        result = cursor.fetchone()
+
+        if result[0] == 0:
+            print(f"\nInserindo no banco de dados: {data}")
+            cursor.execute(query, data)
+        else:
+            print(f"\nRegistro já existente no banco de dados:\n{data}")
+
     conn.commit()
