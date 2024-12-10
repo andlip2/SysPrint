@@ -1,3 +1,4 @@
+-- Tabela print_logs (Recebe os dados do arquivo XLSX)
 CREATE TABLE IF NOT EXISTS print_logs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     `Time` DATETIME,
@@ -13,3 +14,16 @@ CREATE TABLE IF NOT EXISTS print_logs (
     `Grayscale` BOOLEAN,
     `Size` VARCHAR(50)
 );
+-- Tabela print_limits (Guarda os dados do total de impressões)
+CREATE TABLE IF NOT EXISTS print_limits (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    `User` VARCHAR (100) UNIQUE,
+    `Max Prints` INT NOT NULL,
+    `Start Date` DATE NOT NULL,
+    `End Date` DATE NOT NULL
+);
+-- Consulta para identificar quantas impressões o usuário fez
+SELECT `User`,
+    COUNT(*) AS `Total Prints`
+FROM print_logs
+GROUP BY `User`;
