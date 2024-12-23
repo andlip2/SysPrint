@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS print_limits (
     `User` VARCHAR (100) UNIQUE,
     `Max Prints` INT NOT NULL,
     `Start Date` DATE NOT NULL,
-    `End Date` DATE NOT NULL
+    `End Date` DATE NOT NULL,
+    `Last Reset Date` DATE
 );
 -- Consulta para identificar quantas impressões o usuário fez
 SELECT `User`,
