@@ -32,7 +32,7 @@ def main():
     conn = conexao_banco()
     inserir_dados(conn, df)
     conn.close()
-    print("\nConcluído")
+    print("\nConcluído.")
 
 
 if __name__ == "__main__":

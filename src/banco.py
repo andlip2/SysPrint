@@ -47,9 +47,13 @@ def verificar_e_gerenciar_limite(conn, user):
         print(f"Limite de impressões adicionado para {user}.")
         return True
 
-    print(f"Verificando limite para {user}: ")
+    print(f"Verificando limite para {user}...")
     current_date = datetime.now().date()
     end_date = result["End Date"]
+
+    print(f"\nLimite máximo de impressões: {result['Max Prints']}")
+    print(f"Impressões totais feitas até o momento: {result['Total Prints']}")
+    print(f"Data final para o limite de impressões: {end_date}")
 
     if current_date >= end_date:
         print(f"Resetando limite de impressões para {user}.")
@@ -67,6 +71,8 @@ def verificar_e_gerenciar_limite(conn, user):
 
     max_prints = result["Max Prints"]
     total_prints = result["Total Prints"]
+    print(f"Limite de impressões para {user}: {max_prints}")
+    print(f"Total de impressões feitas: {total_prints}")
     return total_prints < max_prints
 
 
@@ -98,7 +104,7 @@ def inserir_dados(conn, df):
             row["Size"],
         )
 
-        print(f"Verificando impressões para {row['User']}...")
+        print(f"\nVerificando impressões para {row['User']}...")
 
         if not verificar_e_gerenciar_limite(conn, row["User"]):
             print(f"\nUsuário {row['User']} atingiu o limite de impressões.")
@@ -114,4 +120,4 @@ def inserir_dados(conn, df):
             print(f"\nRegistro já existente no banco de dados:\n{data}")
 
     conn.commit()
-    print("Dados inseridos no banco.")
+    print("\nDados inseridos no banco.")
