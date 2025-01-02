@@ -33,7 +33,6 @@ def stop_spooler_service():
         print("Certifique-se de que o script está sendo executado com permissões de administrador.")
 
 
-
 def create_tables():
     """Cria as tabelas 'logs' e 'user_print_totals' no banco de dados."""
     create_logs_table = """
@@ -60,16 +59,61 @@ def create_tables():
         PrintLimit INT NOT NULL DEFAULT {DEFAULT_PRINT_LIMIT}
     ) ENGINE=InnoDB;
     """
+    create_reset_table = """
+    CREATE TABLE IF NOT EXISTS reset_info (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        last_reset_month DATE
+    ) ENGINE=InnoDB;
+    """
     try:
         with engine.connect() as connection:
             print("Criando tabelas...")
             connection.execute(text("DROP TABLE IF EXISTS logs"))
             connection.execute(text("DROP TABLE IF EXISTS user_print_totals"))
+            connection.execute(text("DROP TABLE IF EXISTS reset_info"))
             connection.execute(text(create_logs_table))
             connection.execute(text(create_user_totals_table))
+            connection.execute(text(create_reset_table))
             print("Tabelas criadas ou já existentes.")
     except Exception as e:
         print(f"Erro ao criar tabelas: {e}")
+
+
+def check_and_reset_totals():
+    """Verifica se o mês foi alterado e reseta os contadores de impressão."""
+    try:
+        with engine.connect() as connection:
+            # Obter o mês atual
+            current_month = datetime.now().strftime('%Y-%m')
+
+            # Verificar a data do último reset
+            select_query = "SELECT last_reset_month FROM reset_info ORDER BY id DESC LIMIT 1"
+            result = connection.execute(text(select_query)).fetchone()
+
+            if result:
+                last_reset_month = result[0].strftime('%Y-%m')
+            else:
+                last_reset_month = None
+
+            # Se o mês atual for diferente do mês do último reset, resetar os contadores
+            if last_reset_month != current_month:
+                # Resetar os totais de impressão
+                print("Novo mês detectado. Resetando contadores de impressão...")
+
+                # Zerar os totais de impressão
+                update_query = "UPDATE user_print_totals SET TotalPages = 0"
+                connection.execute(text(update_query))
+                print("Totais de impressão resetados para todos os usuários.")
+
+                # Registrar o reset do mês
+                insert_reset_query = "INSERT INTO reset_info (last_reset_month) VALUES (:current_month)"
+                connection.execute(text(insert_reset_query), {'current_month': current_month})
+                print(f"Data do reset registrada: {current_month}")
+            else:
+                print("O mês ainda não foi alterado. Nenhum reset necessário.")
+
+    except Exception as e:
+        print(f"Erro ao verificar ou resetar os totais: {e}")
 
 
 def update_user_totals(user, pages):
@@ -151,7 +195,7 @@ def insert_data_from_csv():
                                     time = datetime.strptime(time, '%Y-%m-%d %H:%M:%S')
                                 except ValueError:
                                     time = None
-                                
+                                  
                                 # Verificar duplicatas
                                 select_query = """
                                 SELECT COUNT(*) FROM logs
@@ -202,4 +246,5 @@ def insert_data_from_csv():
 
 # Criar tabelas e processar dados
 create_tables()
+check_and_reset_totals()  # Verificar e resetar os totais de impressão, se necessário
 insert_data_from_csv()
