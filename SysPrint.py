@@ -231,5 +231,4 @@ def insert_data_from_csv():
 
 # Criar tabelas e processar dados
 create_tables()
-check_and_reset_totals()  # Verificar e resetar os totais de impressão, se necessário
 insert_data_from_csv()

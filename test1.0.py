@@ -33,9 +33,8 @@ def stop_spooler_service():
         print("Certifique-se de que o script está sendo executado com permissões de administrador.")
 
 
-
 def create_tables():
-    """Cria as tabelas 'logs' e 'user_print_totals' no banco de dados."""
+    """Cria as tabelas 'logs' e 'user_print_totals' no banco de dados, sem sobrescrever dados existentes."""
     create_logs_table = """
     CREATE TABLE IF NOT EXISTS logs (
         Time DATETIME,
@@ -62,9 +61,7 @@ def create_tables():
     """
     try:
         with engine.connect() as connection:
-            print("Criando tabelas...")
-            connection.execute(text("DROP TABLE IF EXISTS logs"))
-            connection.execute(text("DROP TABLE IF EXISTS user_print_totals"))
+            print("Criando tabelas, se necessário...")
             connection.execute(text(create_logs_table))
             connection.execute(text(create_user_totals_table))
             print("Tabelas criadas ou já existentes.")
@@ -151,8 +148,8 @@ def insert_data_from_csv():
                                     time = datetime.strptime(time, '%Y-%m-%d %H:%M:%S')
                                 except ValueError:
                                     time = None
-                                
-                                # Verificar duplicatas
+                                  
+                                # Verificar duplicatas antes de inserir os dados
                                 select_query = """
                                 SELECT COUNT(*) FROM logs
                                 WHERE Time = :time AND User = :user AND DocumentName = :document_name
@@ -164,6 +161,7 @@ def insert_data_from_csv():
                                 }).scalar()
                                   
                                 if result == 0:
+                                    # Inserir dados na tabela 'logs'
                                     insert_query = """
                                     INSERT INTO logs (Time, User, Pages, Copies, Printer, DocumentName, Client, PaperSize, Language, Duplex, Grayscale, Size)
                                     VALUES (:time, :user, :pages, :copies, :printer, :document_name, :client, :paper_size, :language, :duplex, :grayscale, :size)
@@ -198,6 +196,7 @@ def insert_data_from_csv():
                 raise e
     except Exception as e:
         print(f"Erro ao processar o arquivo CSV ou inserir dados: {e}")
+
 
 
 # Criar tabelas e processar dados
