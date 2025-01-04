@@ -1,5 +1,6 @@
 import csv
 import os
+import getpass
 import subprocess
 from sqlalchemy import create_engine, text
 from datetime import datetime
@@ -12,25 +13,43 @@ engine = create_engine(db_url)
 csv_file_path = r"C:\\Program Files (x86)\\PaperCut Print Logger\\logs\\csv\\papercut-print-log-all-time.csv"
 
 # Variável para o limite de impressão padrão
-DEFAULT_PRINT_LIMIT = 3000  # Altere este valor conforme necessário
+DEFAULT_PRINT_LIMIT = 300  # Altere este valor conforme necessário
 
 # Verificar se o arquivo existe
 if not os.path.isfile(csv_file_path):
     print(f"Erro: O arquivo {csv_file_path} não foi encontrado.")
 else:
     print(f"Arquivo encontrado: {csv_file_path}")
-
-
-def stop_spooler_service():
-    """Interrompe o serviço do Spooler de Impressão e seus dependentes."""
+    
+def get_logged_in_user():
+    """Retorna o nome do usuário atualmente logado no Windows."""
     try:
-        print("Parando serviços dependentes do Spooler de Impressão...")
-        # Parar o Spooler e todos os serviços dependentes
-        subprocess.run(["sc", "stop", "spooler"], check=True, text=True, shell=True)
-        print("Serviço do Spooler de Impressão interrompido com sucesso.")
-    except subprocess.CalledProcessError as e:
-        print(f"Erro ao tentar parar o Spooler de Impressão: {e}")
-        print("Certifique-se de que o script está sendo executado com permissões de administrador.")
+        # Método mais robusto para obter o usuário logado
+        logged_user = getpass.getuser()
+        print(f"Usuário logado atualmente: {logged_user}")
+        return logged_user
+    except Exception as e:
+        print(f"Erro ao obter o usuário logado: {e}")
+        return None
+
+
+def stop_spooler_service_if_needed(user):
+    """
+    Interrompe o serviço do Spooler de Impressão se o usuário
+    que atingiu o limite for o mesmo que está logado.
+    """
+    logged_in_user = get_logged_in_user()
+
+    if logged_in_user and logged_in_user.lower() == user.lower():
+        try:
+            print(f"Usuário {user} atingiu o limite de impressão e está logado. Interrompendo o Spooler...")
+            subprocess.run(["sc", "stop", "spooler"], check=True, text=True, shell=True)
+            print("Serviço do Spooler de Impressão interrompido com sucesso.")
+        except subprocess.CalledProcessError as e:
+            print(f"Erro ao tentar parar o Spooler de Impressão: {e}")
+            print("Certifique-se de que o script está sendo executado com permissões de administrador.")
+    else:
+        print(f"Usuário {user} atingiu o limite, mas não está logado. O Spooler continuará funcionando.")
 
 
 def create_tables():
@@ -89,7 +108,7 @@ def update_user_totals(user, pages):
                 # Verificar se o limite de impressão foi alcançado
                 if new_total > print_limit:
                     print(f"Aviso: Limite de impressão excedido para o usuário {user}. Total de páginas: {new_total}.")
-                    stop_spooler_service()  # Interromper o Spooler de Impressão
+                    stop_spooler_service_if_needed(user)  # Verificar e parar o Spooler
                     new_total = print_limit  # Opcional: bloqueia o total no limite máximo
 
                 update_query = "UPDATE user_print_totals SET TotalPages = :new_total WHERE User = :user"
