@@ -1,24 +1,25 @@
+import time
 import csv
 import os
 import subprocess
+from notification import show_notification
 from sqlalchemy import create_engine, text
 from datetime import datetime
-from popup import Popup
 import zera
 import psutil
-from plyer import notification
 from win10toast import ToastNotifier
+from block import monitor_print_limit
 
 
 # URL de conexão com o banco
-db_url = "mysql+pymysql://app_user:sysprintusertest@192.168.1.226:3306/sysprint"
+db_url = "mysql+pymysql://admin_user:admsysp%4025@192.168.1.226:3306/sysprint"
 engine = create_engine(db_url)
 
 # Caminho do arquivo CSV
 csv_file_path = r"C:\\Program Files (x86)\\PaperCut Print Logger\\logs\\csv\\papercut-print-log-all-time.csv"
 
 # Variável para o limite de impressão padrão
-DEFAULT_PRINT_LIMIT = 5000  # Altere este valor conforme necessário
+DEFAULT_PRINT_LIMIT = 5  # Altere este valor conforme necessário
 
 # Verificar se o arquivo existe
 if not os.path.isfile(csv_file_path):
@@ -32,7 +33,7 @@ def get_logged_in_user():
     try:
         # Obter o usuário interativo logado
         for user in psutil.users():
-            if user.name != 'SYSTEM':  # Ignorar a conta SYSTEM
+            if user.name != "SYSTEM":  # Ignorar a conta SYSTEM
                 logged_user = user.name
                 print(f"Usuário logado atualmente: {logged_user}")
                 return logged_user
@@ -41,30 +42,48 @@ def get_logged_in_user():
         print(f"Erro ao obter o usuário logado: {e}")
         return None
 
-
+#Para o serviço de spooler e verifica o
 def stop_spooler_service_if_needed(user):
     """
     Interrompe o serviço do Spooler de Impressão se o usuário
     que atingiu o limite for o mesmo que está logado.
     """
     logged_in_user = get_logged_in_user()
+    print(
+        f"Usuário logado: {logged_in_user}\nUsuário que atingiu o limite de impressões {user}"
+    )
 
     if logged_in_user and logged_in_user.lower() == user.lower():
         try:
-            print(f"Usuário {user} atingiu o limite de impressão e está logado. Interrompendo o Spooler...")
-            subprocess.run(["sc", "stop", "PCPrintLogger"], check=True, text=True, shell=True)
+            print(
+                f"Usuário {user} atingiu o limite de impressão e está logado. Interrompendo o Spooler..."
+            )
+
+            # Mostra a notificação do windows
+            print("Chamando not")
+            show_notification(
+                "Limite de impressões atingido",
+                f"O usuário {user} atingiu o limite de impressões e foi bloqueado.",
+                duration=15,
+            )
+
+            time.sleep(5)
+
+            subprocess.run(
+                ["sc", "stop", "PCPrintLogger"], check=True, text=True, shell=True
+            )
             subprocess.run(["sc", "stop", "spooler"], check=True, text=True, shell=True)
             print("Serviço do Spooler de Impressão interrompido com sucesso.")
-            
-            # Mostrar a notificação na tela informando que o usuário atingiu o limite
-            popup = Popup("Limite de Impressões Atingido", f"Usuário {user} atingiu o limite de impressões e foi bloqueado.")
-            popup.mostrar()
 
         except subprocess.CalledProcessError as e:
             print(f"Erro ao tentar parar o Spooler de Impressão: {e}")
-            print("Certifique-se de que o script está sendo executado com permissões de administrador.")
+            print(
+                "Certifique-se de que o script está sendo executado com permissões de administrador."
+            )
     else:
-        print(f"Usuário {user} atingiu o limite, mas não está logado. O Spooler continuará funcionando.")
+        print(
+            f"Usuário {user} atingiu o limite, mas não está logado. O Spooler continuará funcionando."
+        )
 
 
 def create_tables():
@@ -90,8 +109,8 @@ def create_tables():
     CREATE TABLE IF NOT EXISTS user_print_totals (
         User VARCHAR(255) PRIMARY KEY,
         TotalPages INT NOT NULL DEFAULT 0,
-        PrintLimit INT NOT NULL DEFAULT {DEFAULT_PRINT_LIMIT}
-        Bloqueado INT NOT NULL DEFAUT 0
+        PrintLimit INT NOT NULL DEFAULT {DEFAULT_PRINT_LIMIT},
+        Blocked BOOLEAN NOT NULL DEFAULT FALSE
     ) ENGINE=InnoDB;
     """
     try:
@@ -245,25 +264,19 @@ def insert_data_from_csv():
                                 print(f"Erro: Linha com dados insuficientes: {row}")
                 transaction.commit()
                 print("Todos os dados foram inseridos com sucesso.")
-                toaster = ToastNotifier()
-                toaster.show_toast(
-                    "Limite de Impressões Atingido",  # Título
-                    f'O usuário {user} atingiu o limite de impressões e foi bloqueado.',  # Mensagem
-                    duration=10,  # A notificação ficará visível por 10 segundos
-                    threaded=True  # Deixa a notificação rodando em segundo plano
-                
-                )
             except Exception as e:
                 transaction.rollback()
                 raise e
     except Exception as e:
         print(f"Erro ao processar o arquivo CSV ou inserir dados: {e}")
-        
 
 
 # Criar tabelas e processar dados
 create_tables()
 insert_data_from_csv()
+usuario_logado = get_logged_in_user()
+monitor_print_limit(usuario_logado)
 
 # Verificação de reset
 zera.run(engine)
+
