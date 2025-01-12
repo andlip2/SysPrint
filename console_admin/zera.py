@@ -1,11 +1,12 @@
 from sqlalchemy import create_engine, text
 from datetime import datetime
+from PyQt5.QtWidgets import QMessageBox
 
 # Configurações do banco de dados
 db_url = "mysql+pymysql://app_user:sysprintusertest@192.168.1.226:3306/sysprint"
 engine = create_engine(db_url)
 
-def reset_all_users(messagebox):
+def reset_all_users():
     try:
         with engine.connect() as connection:
             # Zerar o contador para todos os usuários
@@ -18,13 +19,13 @@ def reset_all_users(messagebox):
             connection.execute(text(insert_query), {'last_reset': datetime.now()})
             connection.commit()
 
-        messagebox.showinfo("Sucesso", "Contador de todos os usuários resetado com sucesso!")
+        QMessageBox.information(None, "Sucesso", "Contador de todos os usuários resetado com sucesso!")
     except Exception as e:
-        messagebox.showerror("Erro", f"Erro ao resetar todos os usuários: {e}")
+        QMessageBox.critical(None, "Erro", f"Erro ao resetar todos os usuários: {e}")
 
-def reset_specific_user(user_id, messagebox):
+def reset_specific_user(user_id):
     if not user_id:
-        messagebox.showwarning("Aviso", "Por favor, insira o nome do usuário.")
+        QMessageBox.warning(None, "Aviso", "Por favor, insira o nome do usuário.")
         return
 
     try:
@@ -34,7 +35,7 @@ def reset_specific_user(user_id, messagebox):
             rows_updated = connection.execute(text(update_query), {'user_id': user_id}).rowcount
 
             if rows_updated == 0:
-                messagebox.showwarning("Aviso", f"Nenhum usuário encontrado com o nome '{user_id}'.")
+                QMessageBox.warning(None, "Aviso", f"Nenhum usuário encontrado com o nome '{user_id}'.")
             else:
                 connection.commit()
 
@@ -43,6 +44,6 @@ def reset_specific_user(user_id, messagebox):
                 connection.execute(text(insert_query), {'last_reset': datetime.now()})
                 connection.commit()
 
-                messagebox.showinfo("Sucesso", f"Contador do usuário '{user_id}' resetado com sucesso!")
+                QMessageBox.information(None, "Sucesso", f"Contador do usuário '{user_id}' resetado com sucesso!")
     except Exception as e:
-        messagebox.showerror("Erro", f"Erro ao resetar o usuário '{user_id}': {e}")
+        QMessageBox.critical(None, "Erro", f"Erro ao resetar o usuário '{user_id}': {e}")

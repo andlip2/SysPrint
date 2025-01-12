@@ -1,79 +1,164 @@
-import tkinter as tk
-from tkinter import messagebox
+from PyQt5.QtWidgets import (
+    QApplication,
+    QWidget,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QVBoxLayout,
+    QHBoxLayout,
+    QMessageBox,
+    QGridLayout,
+    QRadioButton,
+)
+from PyQt5.QtCore import Qt
 from zera import reset_all_users, reset_specific_user
 from limite import set_user_limit
 
-# Criação da janela principal
-root = tk.Tk()
-root.title("Console Admin")
-root.geometry("350x400")  # Tamanho inicial
 
-# Configurar grid para responsividade
-for i in range(7):  # Total de linhas
-    root.grid_rowconfigure(i, weight=1)
-for j in range(2):  # Total de colunas
-    root.grid_columnconfigure(j, weight=1)
+class AdminConsole(QWidget):
+    def __init__(self):
+        super().__init__()
 
-# Título
-title_label = tk.Label(root, text="Contadores e Limites", font=("Arial", 18, "bold"))
-title_label.grid(row=0, column=0, columnspan=2, pady=20, sticky="n")
+        self.setWindowTitle("Console Admin")
+        self.setGeometry(100, 100, 350, 400)
 
-# Botão para resetar todos os usuários
-reset_all_btn = tk.Button(
-    root,
-    text="Resetar Todos os Usuários",
-    command=lambda: reset_all_users(messagebox),
-    bg="red",
-    fg="white",
-    font=("Arial", 12),
-    height=2,
-    width=25,
-)
-reset_all_btn.grid(row=1, column=0, columnspan=2, pady=10)
+        # Layout principal
+        main_layout = QVBoxLayout()
+        main_layout.setSpacing(15)  # Espaçamento entre widgets
 
-# Campo para informar o usuário
-user_label = tk.Label(root, text="Usuário:", font=("Arial", 12), anchor="w")
-user_label.grid(row=2, column=0, padx=10, pady=5, sticky="w")
+        # Título
+        title_label = QLabel("Contadores e Limites")
+        title_label.setStyleSheet("font-size: 18px; font-weight: bold; text-align: center;")
+        title_label.setAlignment(Qt.AlignCenter)
+        main_layout.addWidget(title_label)
 
-user_input = tk.Entry(root, font=("Arial", 12))
-user_input.grid(row=2, column=1, padx=10, pady=5, sticky="ew")
+        # Grid para os campos de entrada e labels
+        form_layout = QGridLayout()
+        form_layout.setHorizontalSpacing(10)
+        form_layout.setVerticalSpacing(10)
 
-# Campo para definir limite personalizado
-limit_label = tk.Label(root, text="Limite:", font=("Arial", 12), anchor="w")
-limit_label.grid(row=3, column=0, padx=10, pady=5, sticky="w")
+        # Campo para informar o usuário
+        user_label = QLabel("Usuário:")
+        user_label.setStyleSheet("font-size: 12px;")
+        self.user_input = QLineEdit()
+        self.user_input.setPlaceholderText("Digite o usuário")
+        self.user_input.setStyleSheet(
+            "padding: 5px; border-radius: 12px;"  # Adicionando bordas arredondadas
+        )
+        form_layout.addWidget(user_label, 0, 0)
+        form_layout.addWidget(self.user_input, 0, 1)
 
-limit_input = tk.Entry(root, font=("Arial", 12))
-limit_input.grid(row=3, column=1, padx=10, pady=5, sticky="ew")
+        # Campo para definir limite personalizado
+        limit_label = QLabel("Limite:")
+        limit_label.setStyleSheet("font-size: 12px;")
+        self.limit_input = QLineEdit()
+        self.limit_input.setPlaceholderText("Digite o limite")
+        self.limit_input.setStyleSheet(
+            "padding: 5px; border-radius: 12px;"  # Adicionando bordas arredondadas
+        )
+        form_layout.addWidget(limit_label, 1, 0)
+        form_layout.addWidget(self.limit_input, 1, 1)
 
-# Botão para resetar usuário específico
-reset_user_btn = tk.Button(
-    root,
-    text="Resetar Contador",
-    command=lambda: reset_specific_user(user_input.get().strip(), messagebox),
-    bg="blue",
-    fg="white",
-    font=("Arial", 12),
-    height=2,
-    width=25,
-)
-reset_user_btn.grid(row=4, column=0, columnspan=2, pady=10)
+        main_layout.addLayout(form_layout)
 
-# Botão para definir limite
-set_limit_btn = tk.Button(
-    root,
-    text="Definir Limite",
-    command=lambda: set_user_limit(user_input.get().strip(), limit_input.get().strip(), messagebox),
-    bg="green",
-    fg="white",
-    font=("Arial", 12),
-    height=2,
-    width=25,
-)
-set_limit_btn.grid(row=5, column=0, columnspan=2, pady=10)
+        # Divisor para separar funções
+        divider_label = QLabel("Funções")
+        divider_label.setStyleSheet("font-size: 14px; font-weight: bold; text-align: center; padding: 10px;")
+        main_layout.addWidget(divider_label)
 
-# Rodapé
-footer_label = tk.Label(root, text="© 2025 - Sistema de Reset e Limites", font=("Arial", 10))
-footer_label.grid(row=6, column=0, columnspan=2, pady=10, sticky="s")
+        # Radio buttons para ações
+        self.radio_reset_all = QRadioButton("Resetar todos os usuários")
+        self.radio_reset_user = QRadioButton("Resetar contador do usuário")
+        self.radio_set_limit = QRadioButton("Definir limite do usuário")
 
-# Executar a interface
-root.mainloop()
+        # Agrupar os radio buttons para garantir que apenas um pode ser selecionado
+        self.radio_group = [self.radio_reset_all, self.radio_reset_user, self.radio_set_limit]
+        for radio in self.radio_group:
+            radio.setStyleSheet("font-size: 12px;")
+            radio.toggled.connect(self.update_fields_state)  # Conectar ao evento de mudança de estado
+            main_layout.addWidget(radio)
+
+        # Botão para executar ação com base na opção selecionada
+        execute_btn = QPushButton("Executar Ação")
+        execute_btn.setStyleSheet(
+            """
+            QPushButton {
+                background-color: orange;
+                color: white;
+                font-size: 12px;
+                padding: 8px;
+                border-radius: 15px;
+            }
+            QPushButton:hover {
+                background-color: darkorange;
+            }
+            """
+        )
+        execute_btn.clicked.connect(self.execute_action)
+        main_layout.addWidget(execute_btn)
+
+        # Rodapé
+        footer_label = QLabel("© 2025 - Sistema de Reset e Limites")
+        footer_label.setStyleSheet("font-size: 10px; text-align: center;")
+        footer_label.setAlignment(Qt.AlignCenter)
+        main_layout.addWidget(footer_label)
+
+        self.setLayout(main_layout)
+
+        # Inicializa o comportamento dos campos
+        self.update_fields_state()
+
+    def update_fields_state(self):
+        # Desabilita/abilita os campos de acordo com a opção selecionada
+        if self.radio_reset_all.isChecked():
+            self.user_input.setEnabled(False)
+            self.limit_input.setEnabled(False)
+            self.user_input.setStyleSheet("padding: 5px; border-radius: 12px; background-color: #D3D3D3;")  # Cinza
+            self.limit_input.setStyleSheet("padding: 5px; border-radius: 12px; background-color: #D3D3D3;")  # Cinza
+        elif self.radio_reset_user.isChecked():
+            self.user_input.setEnabled(True)
+            self.limit_input.setEnabled(False)
+            self.user_input.setStyleSheet("padding: 5px; border-radius: 12px;")  # Branco
+            self.limit_input.setStyleSheet("padding: 5px; border-radius: 12px; background-color: #D3D3D3;")  # Cinza
+        elif self.radio_set_limit.isChecked():
+            self.user_input.setEnabled(True)
+            self.limit_input.setEnabled(True)
+            self.user_input.setStyleSheet("padding: 5px; border-radius: 12px;")  # Branco
+            self.limit_input.setStyleSheet("padding: 5px; border-radius: 12px;")  # Branco
+
+    def execute_action(self):
+        # Verifica qual radio button foi selecionado
+        user = self.user_input.text().strip()
+        limit = self.limit_input.text().strip()
+
+        if self.radio_reset_all.isChecked():
+            result = QMessageBox.question(
+                self, "Confirmação", "Deseja resetar todos os usuários?",
+                QMessageBox.Yes | QMessageBox.No, QMessageBox.No
+            )
+            if result == QMessageBox.Yes:
+                reset_all_users(QMessageBox)
+                QMessageBox.information(self, "Sucesso", "Todos os usuários foram resetados.")
+
+        elif self.radio_reset_user.isChecked():
+            if not user:
+                QMessageBox.warning(self, "Erro", "Por favor, informe um usuário.")
+                return
+            reset_specific_user(user, QMessageBox)
+            QMessageBox.information(self, "Sucesso", f"O contador do usuário {user} foi resetado.")
+
+        elif self.radio_set_limit.isChecked():
+            if not user or not limit:
+                QMessageBox.warning(self, "Erro", "Por favor, informe o usuário e o limite.")
+                return
+            set_user_limit(user, limit, QMessageBox)
+            QMessageBox.information(self, "Sucesso", f"O limite do usuário {user} foi definido para {limit}.")
+
+
+if __name__ == "__main__":
+    import sys
+
+    app = QApplication(sys.argv)
+    window = AdminConsole()
+    window.show()
+    sys.exit(app.exec_())

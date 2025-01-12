@@ -26,8 +26,9 @@ def monitor_print_limit(user):
                 if total_pages >= print_limit:
                     print(f"Usuário {user} atingiu o limite de impressão ou já está desbloqueado.")
                     
-
-                        # Atualizar a coluna 'Blocked' para 0
+                else:
+                    print(f"Usuário {user} ainda não atingiu o limite de impressão.")
+                    # Atualizar a coluna 'Blocked' para 0
                     update_query = """
                         UPDATE user_print_totals
                         SET Blocked = 0
@@ -40,8 +41,6 @@ def monitor_print_limit(user):
                             ["sc", "start", "PCPrintLogger"], check=True, text=True, shell=True
                         )
                     print(f"Serviço 'PCPrintLogger' iniciado com sucesso para o usuário {user}.")
-                else:
-                    print(f"Usuário {user} ainda não atingiu o limite de impressão.")
             else:
                 print(f"Usuário {user} não encontrado na tabela.")
 
