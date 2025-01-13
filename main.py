@@ -42,7 +42,8 @@ def get_logged_in_user():
         print(f"Erro ao obter o usuário logado: {e}")
         return None
 
-#Para o serviço de spooler e verifica o
+
+# Para o serviço de spooler e verifica o
 def stop_spooler_service_if_needed(user):
     """
     Interrompe o serviço do Spooler de Impressão se o usuário
@@ -131,32 +132,39 @@ def update_user_totals(user, pages):
             transaction = connection.begin()
 
             # Verificar se o usuário já existe na tabela
-            select_query = "SELECT TotalPages, PrintLimit FROM user_print_totals WHERE User = :user"
+            select_query = "SELECT TotalPages, PrintLimit, Blocked FROM user_print_totals WHERE User = :user"
             result = connection.execute(text(select_query), {"user": user}).fetchone()
 
             if result:
                 # Se o usuário já existir, atualizar o total de páginas
                 current_total = result[0]
                 print_limit = result[1]
+                blocked = result[2]
                 new_total = current_total + pages
 
                 # Verificar se o limite de impressão foi alcançado
-                if new_total > print_limit:
+                if new_total >= print_limit:
                     print(
                         f"Aviso: Limite de impressão excedido para o usuário {user}. Total de páginas: {new_total}."
                     )
+                    # Atualizar a coluna 'Blocked' para TRUE
+                    update_query = "UPDATE user_print_totals SET TotalPages = :new_total, Blocked = TRUE WHERE User = :user"
+                    connection.execute(
+                        text(update_query), {"new_total": new_total, "user": user}
+                    )
                     stop_spooler_service_if_needed(user)  # Verificar e parar o Spooler
-                    new_total = print_limit  # Bloqueia o total no limite máximo
+                else:
+                    # Caso o limite não tenha sido alcançado, só atualiza o total de páginas
+                    update_query = "UPDATE user_print_totals SET TotalPages = :new_total WHERE User = :user"
+                    connection.execute(
+                        text(update_query), {"new_total": new_total, "user": user}
+                    )
+                    print(f"Total de páginas atualizado para {user}: {new_total}")
 
-                update_query = "UPDATE user_print_totals SET TotalPages = :new_total WHERE User = :user"
-                connection.execute(
-                    text(update_query), {"new_total": new_total, "user": user}
-                )
-                print(f"Total de páginas atualizado para {user}: {new_total}")
             else:
                 # Se o usuário não existir, inserir um novo registro com o limite de impressão
                 insert_query = """
-                INSERT INTO user_print_totals (User, TotalPages, PrintLimit) VALUES (:user, :pages, :print_limit)
+                INSERT INTO user_print_totals (User, TotalPages, PrintLimit, Blocked) VALUES (:user, :pages, :print_limit, FALSE)
                 """
                 connection.execute(
                     text(insert_query),
@@ -280,3 +288,4 @@ monitor_print_limit(usuario_logado)
 # Verificação de reset
 zera.run(engine)
 
+time.sleep(3600)
