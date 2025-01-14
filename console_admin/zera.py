@@ -3,7 +3,7 @@ from datetime import datetime
 from PyQt5.QtWidgets import QMessageBox
 
 # Configurações do banco de dados
-db_url = "mysql+pymysql://app_user:sysprintusertest@192.168.1.226:3306/sysprint"
+db_url = "mysql+pymysql://admin_user:admsysp%4025@192.168.1.226:3306/sysprint"
 engine = create_engine(db_url)
 
 def reset_all_users():

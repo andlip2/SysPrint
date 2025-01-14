@@ -5,7 +5,6 @@ from PyQt5.QtWidgets import (
     QLineEdit,
     QPushButton,
     QVBoxLayout,
-    QHBoxLayout,
     QMessageBox,
     QGridLayout,
     QRadioButton,
@@ -137,14 +136,14 @@ class AdminConsole(QWidget):
                 QMessageBox.Yes | QMessageBox.No, QMessageBox.No
             )
             if result == QMessageBox.Yes:
-                reset_all_users(QMessageBox)
+                reset_all_users()
                 QMessageBox.information(self, "Sucesso", "Todos os usuários foram resetados.")
 
         elif self.radio_reset_user.isChecked():
             if not user:
                 QMessageBox.warning(self, "Erro", "Por favor, informe um usuário.")
                 return
-            reset_specific_user(user, QMessageBox)
+            reset_specific_user(user)
             QMessageBox.information(self, "Sucesso", f"O contador do usuário {user} foi resetado.")
 
         elif self.radio_set_limit.isChecked():

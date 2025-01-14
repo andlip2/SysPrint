@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, text
 from PyQt5.QtWidgets import QMessageBox
 
 # Configurações do banco de dados
-db_url = "mysql+pymysql://app_user:sysprintusertest@192.168.1.226:3306/sysprint"
+db_url = "mysql+pymysql://admin_user:admsysp%4025@192.168.1.226:3306/sysprint"
 engine = create_engine(db_url)
 
 def set_user_limit(user_id, print_limit, messagebox):
@@ -30,10 +30,12 @@ def set_user_limit(user_id, print_limit, messagebox):
                 )
             else:
                 # `commit` não é necessário no SQLAlchemy se estiver usando `engine.connect()`
+                connection.commit()
                 messagebox.information(
                     None, 
                     "Sucesso", 
                     f"Limite de impressão para '{user_id}' definido como {print_limit}!"
+                    
                 )
     except Exception as e:
         messagebox.critical(
