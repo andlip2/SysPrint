@@ -1,27 +1,22 @@
-import pymysql
+# Importa a função listar_impressoras
+from listar_impressoras import listar_impressoras  # Salve a função anterior em listar_impressoras.py
 
-# Configuração da conexão com o banco de dados MySQL remoto
-host = '192.168.2.131'  # Altere para o IP ou nome do host do computador remoto
-user = 'sysprint'  # Nome de usuário criado para acesso remoto
-password = 'farti@2025'  # Senha do usuário
-database = 'teste_rc'  # Nome do banco de dados
+# Função principal
+def executar_para_impressoras_virtuais():
+    impressoras = listar_impressoras()
+    for impressora in impressoras:
+        if impressora["Tipo"] == "Virtual":
+            nome_impressora = impressora["Nome"]
+            print(f"Executando para impressora virtual: {nome_impressora}")
+            
+            # Substitua pelo código que deve ser executado para impressoras virtuais
+            realizar_operacao_com_impressora_virtual(nome_impressora)
 
-try:
-    # Estabelece a conexão com o banco de dados
-    connection = pymysql.connect(
-        host=host,
-        user=user,
-        password=password,
-        database=database,
-        port=3306  # Porta padrão do MySQL
-    )
+# Função de exemplo para realizar operações com impressoras virtuais
+def realizar_operacao_com_impressora_virtual(nome_impressora):
+    # Exemplo de operação: apenas imprimir o nome
+    print(f"Operação realizada com a impressora: {nome_impressora}")
 
-    # Se a conexão for bem-sucedida
-    print(f"Conexão estabelecida com sucesso no banco de dados '{database}'!")
-    
-    # Fechar a conexão após o teste
-    connection.close()
-
-except pymysql.MySQLError as e:
-    # Se ocorrer algum erro de conexão
-    print(f"Erro ao conectar ao MySQL: {e}")
+# Executa o script principal
+if __name__ == "__main__":
+    executar_para_impressoras_virtuais()

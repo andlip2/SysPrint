@@ -13,7 +13,6 @@ from PyQt5.QtCore import Qt
 from zera import reset_all_users, reset_specific_user
 from limite import set_user_limit
 
-
 class AdminConsole(QWidget):
     def __init__(self):
         super().__init__()

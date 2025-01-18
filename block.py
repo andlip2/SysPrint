@@ -46,3 +46,4 @@ def monitor_print_limit(user):
 
     except Exception as e:
         print(f"Erro ao verificar ou desbloquear o usuário {user}: {e}")
+        
