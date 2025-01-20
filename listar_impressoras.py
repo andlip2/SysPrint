@@ -31,3 +31,29 @@ def listar_impressoras():
         })
 
     return impressoras
+
+def obter_impressoras_virtuais():
+    """
+    Retorna uma lista com os nomes de todas as impressoras virtuais encontradas.
+    """
+    impressoras = listar_impressoras()
+    impressoras_virtuais = [
+        impressora["Nome"] for impressora in impressoras if impressora["Tipo"] == "Virtual"
+    ]
+    return impressoras_virtuais
+
+def comparar_impressoras(nome_impressora):
+    """
+    Compara o nome de uma impressora com a lista de impressoras virtuais.
+
+    :param nome_impressora: Nome da impressora a ser comparada (string).
+    :return: True se a impressora for virtual, False caso contrário.
+    """
+    # Obtém a lista de impressoras virtuais
+    impressoras_virtuais = obter_impressoras_virtuais()
+    # Remove espaços extras e realiza a comparação
+    nome_impressora = nome_impressora.strip()
+    if nome_impressora in impressoras_virtuais:
+        return True
+    else:
+        return False

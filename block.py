@@ -1,10 +1,10 @@
 import subprocess
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
+from para_spooler import stop_spooler_service_if_needed
 
-# Defina o motor do banco de dados
-engine = create_engine("mysql+pymysql://admin_user:admsysp%4025@192.168.1.226:3306/sysprint")
 
-def monitor_print_limit(user):
+
+def monitor_print_limit(user, usuario_logado, engine):
     """Verifica se o usuário atingiu o limite de impressão e atualiza o status 'Blocked' e inicia o serviço 'PCPrintLogger'."""
     try:
         with engine.connect() as connection:
@@ -25,6 +25,7 @@ def monitor_print_limit(user):
                 # Verifica se o usuário atingiu o limite
                 if total_pages >= print_limit:
                     print(f"Usuário {user} atingiu o limite de impressão ou já está desbloqueado.")
+                    stop_spooler_service_if_needed(user, usuario_logado)
                     
                 else:
                     print(f"Usuário {user} ainda não atingiu o limite de impressão.")
