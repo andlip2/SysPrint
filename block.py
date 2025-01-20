@@ -1,6 +1,6 @@
 import subprocess
 from sqlalchemy import text
-from para_spooler import stop_spooler_service_if_needed
+from stop_spooler import stop_spooler_service_if_needed
 
 
 

@@ -1,5 +1,5 @@
 from sqlalchemy import text
-from para_spooler import stop_spooler_service_if_needed
+from stop_spooler import stop_spooler_service_if_needed
 
 
 def update_user_totals(user, pages, DEFAULT_PRINT_LIMIT, engine, user_logado):

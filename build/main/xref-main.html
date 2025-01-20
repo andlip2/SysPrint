@@ -28,7 +28,6 @@ imports:
  &#8226;   <a href="#collections.abc">collections.abc</a>
  &#8226;   <a href="#copyreg">copyreg</a>
  &#8226;   <a href="#create_tables">create_tables</a>
- &#8226;   <a href="#ctypes">ctypes</a>
  &#8226;   <a href="#encodings">encodings</a>
  &#8226;   <a href="#encodings.aliases">encodings.aliases</a>
  &#8226;   <a href="#encodings.ascii">encodings.ascii</a>
@@ -164,7 +163,6 @@ imports:
  &#8226;   <a href="#operator">operator</a>
  &#8226;   <a href="#os">os</a>
  &#8226;   <a href="#posixpath">posixpath</a>
- &#8226;   <a href="#psutil">psutil</a>
  &#8226;   <a href="#pyi_rth__tkinter.py">pyi_rth__tkinter.py</a>
  &#8226;   <a href="#pyi_rth_cryptography_openssl.py">pyi_rth_cryptography_openssl.py</a>
  &#8226;   <a href="#pyi_rth_inspect.py">pyi_rth_inspect.py</a>
@@ -2846,8 +2844,8 @@ imported by:
   <a target="code" href="///C:/Users/anderson.filipe.FARMACE-LAN/Documents/GitHub/SysPrint/atualiza_user.py" type="text/plain"><tt>atualiza_user</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
-    <a href="#para_spooler">para_spooler</a>
- &#8226;   <a href="#sqlalchemy">sqlalchemy</a>
+    <a href="#sqlalchemy">sqlalchemy</a>
+ &#8226;   <a href="#stop_spooler">stop_spooler</a>
 
   </div>
   <div class="import">
@@ -2970,8 +2968,8 @@ imported by:
   <a target="code" href="///C:/Users/anderson.filipe.FARMACE-LAN/Documents/GitHub/SysPrint/block.py" type="text/plain"><tt>block</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
-    <a href="#para_spooler">para_spooler</a>
- &#8226;   <a href="#sqlalchemy">sqlalchemy</a>
+    <a href="#sqlalchemy">sqlalchemy</a>
+ &#8226;   <a href="#stop_spooler">stop_spooler</a>
  &#8226;   <a href="#subprocess">subprocess</a>
 
   </div>
@@ -5267,7 +5265,6 @@ imported by:
  &#8226;   <a href="#firebird.driver.fbapi">firebird.driver.fbapi</a>
  &#8226;   <a href="#firebird.driver.interfaces">firebird.driver.interfaces</a>
  &#8226;   <a href="#google.protobuf.internal.type_checkers">google.protobuf.internal.type_checkers</a>
- &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#multiprocessing.sharedctypes">multiprocessing.sharedctypes</a>
  &#8226;   <a href="#packaging._manylinux">packaging._manylinux</a>
  &#8226;   <a href="#pkg_resources._vendor.appdirs">pkg_resources._vendor.appdirs</a>
@@ -13992,7 +13989,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#main.py">main.py</a>
- &#8226;   <a href="#para_spooler">para_spooler</a>
+ &#8226;   <a href="#stop_spooler">stop_spooler</a>
 
   </div>
 
@@ -14724,27 +14721,6 @@ imported by:
  &#8226;   <a href="#packaging.utils">packaging.utils</a>
  &#8226;   <a href="#pkg_resources">pkg_resources</a>
  &#8226;   <a href="#sqlalchemy_firebird.base">sqlalchemy_firebird.base</a>
-
-  </div>
-
-</div>
-
-<div class="node">
-  <a name="para_spooler"></a>
-  <a target="code" href="///C:/Users/anderson.filipe.FARMACE-LAN/Documents/GitHub/SysPrint/para_spooler.py" type="text/plain"><tt>para_spooler</tt></a>
-<span class="moduletype">SourceModule</span>  <div class="import">
-imports:
-    <a href="#notification">notification</a>
- &#8226;   <a href="#popup">popup</a>
- &#8226;   <a href="#psutil">psutil</a>
- &#8226;   <a href="#subprocess">subprocess</a>
- &#8226;   <a href="#time">time</a>
-
-  </div>
-  <div class="import">
-imported by:
-    <a href="#atualiza_user">atualiza_user</a>
- &#8226;   <a href="#block">block</a>
 
   </div>
 
@@ -16143,7 +16119,7 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#para_spooler">para_spooler</a>
+    <a href="#stop_spooler">stop_spooler</a>
 
   </div>
 
@@ -16258,13 +16234,12 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#main.py">main.py</a>
- &#8226;   <a href="#para_spooler">para_spooler</a>
- &#8226;   <a href="#psutil">psutil</a>
+    <a href="#psutil">psutil</a>
  &#8226;   <a href="#psutil._common">psutil._common</a>
  &#8226;   <a href="#psutil._compat">psutil._compat</a>
  &#8226;   <a href="#psutil._psutil_windows">psutil._psutil_windows</a>
  &#8226;   <a href="#psutil._pswindows">psutil._pswindows</a>
+ &#8226;   <a href="#stop_spooler">stop_spooler</a>
 
   </div>
 
@@ -26530,6 +26505,27 @@ imported by:
 </div>
 
 <div class="node">
+  <a name="stop_spooler"></a>
+  <a target="code" href="///C:/Users/anderson.filipe.FARMACE-LAN/Documents/GitHub/SysPrint/stop_spooler.py" type="text/plain"><tt>stop_spooler</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#notification">notification</a>
+ &#8226;   <a href="#popup">popup</a>
+ &#8226;   <a href="#psutil">psutil</a>
+ &#8226;   <a href="#subprocess">subprocess</a>
+ &#8226;   <a href="#time">time</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#atualiza_user">atualiza_user</a>
+ &#8226;   <a href="#block">block</a>
+
+  </div>
+
+</div>
+
+<div class="node">
   <a name="string"></a>
   <a target="code" href="///C:/Program%20Files/WindowsApps/PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0/Lib/string.py" type="text/plain"><tt>string</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
@@ -26670,7 +26666,6 @@ imported by:
  &#8226;   <a href="#os">os</a>
  &#8226;   <a href="#packaging._musllinux">packaging._musllinux</a>
  &#8226;   <a href="#packaging.tags">packaging.tags</a>
- &#8226;   <a href="#para_spooler">para_spooler</a>
  &#8226;   <a href="#pkg_resources._vendor.jaraco.context">pkg_resources._vendor.jaraco.context</a>
  &#8226;   <a href="#pkg_resources._vendor.packaging._musllinux">pkg_resources._vendor.packaging._musllinux</a>
  &#8226;   <a href="#platform">platform</a>
@@ -26678,6 +26673,7 @@ imported by:
  &#8226;   <a href="#psutil._compat">psutil._compat</a>
  &#8226;   <a href="#pydoc">pydoc</a>
  &#8226;   <a href="#pyi_rth_multiprocessing.py">pyi_rth_multiprocessing.py</a>
+ &#8226;   <a href="#stop_spooler">stop_spooler</a>
  &#8226;   <a href="#uuid">uuid</a>
  &#8226;   <a href="#webbrowser">webbrowser</a>
 
@@ -27148,7 +27144,6 @@ imported by:
  &#8226;   <a href="#multiprocessing.pool">multiprocessing.pool</a>
  &#8226;   <a href="#multiprocessing.queues">multiprocessing.queues</a>
  &#8226;   <a href="#multiprocessing.synchronize">multiprocessing.synchronize</a>
- &#8226;   <a href="#para_spooler">para_spooler</a>
  &#8226;   <a href="#pkg_resources">pkg_resources</a>
  &#8226;   <a href="#pkg_resources._vendor.jaraco.functools">pkg_resources._vendor.jaraco.functools</a>
  &#8226;   <a href="#pkg_resources._vendor.more_itertools.more">pkg_resources._vendor.more_itertools.more</a>
@@ -27169,6 +27164,7 @@ imported by:
  &#8226;   <a href="#sqlalchemy.util.queue">sqlalchemy.util.queue</a>
  &#8226;   <a href="#sqlite3.dbapi2">sqlite3.dbapi2</a>
  &#8226;   <a href="#ssl">ssl</a>
+ &#8226;   <a href="#stop_spooler">stop_spooler</a>
  &#8226;   <a href="#subprocess">subprocess</a>
  &#8226;   <a href="#tarfile">tarfile</a>
  &#8226;   <a href="#threading">threading</a>

@@ -1185,9 +1185,6 @@
   ('packaging.version',
    'C:\\Users\\anderson.filipe.FARMACE-LAN\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\site-packages\\packaging\\version.py',
    'PYMODULE'),
-  ('para_spooler',
-   'C:\\Users\\anderson.filipe.FARMACE-LAN\\Documents\\GitHub\\SysPrint\\para_spooler.py',
-   'PYMODULE'),
   ('pathlib',
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\pathlib.py',
@@ -2197,6 +2194,9 @@
   ('statistics',
    'C:\\Program '
    'Files\\WindowsApps\\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\\Lib\\statistics.py',
+   'PYMODULE'),
+  ('stop_spooler',
+   'C:\\Users\\anderson.filipe.FARMACE-LAN\\Documents\\GitHub\\SysPrint\\stop_spooler.py',
    'PYMODULE'),
   ('string',
    'C:\\Program '

@@ -4,12 +4,10 @@ import subprocess
 from notification import show_notification
 from sqlalchemy import create_engine, text
 import zera
-import psutil
 from block import monitor_print_limit
 from create_tables import create_tables
 from carrega_csv import insert_data_from_csv
 import wmi
-from ctypes import windll, create_unicode_buffer
 
 # URL de conexão com o banco
 db_url = "mysql+pymysql://admin_user:admsysp%4025@192.168.1.226:3306/sysprint"
@@ -114,7 +112,7 @@ def verificar_service_on(user):
                         break  # Sai do loop se Service_on for FALSE
 
                 # Aguarda 1 segundos antes de verificar novamente
-                time.sleep(1)
+                time.sleep(100)
 
     except Exception as e:
         print(f"Erro ao verificar 'Service_on' para o usuário {user}: {e}")
