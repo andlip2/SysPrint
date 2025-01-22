@@ -16,6 +16,8 @@ engine = create_engine(db_url)
 # Caminho do arquivo CSV
 csv_file_path = r"C:\\Program Files (x86)\\PaperCut Print Logger\\logs\\csv\\papercut-print-log-all-time.csv"
 
+service_on = True
+
 # Variável para o limite de impressão padrão
 DEFAULT_PRINT_LIMIT = 3000  # Altere este valor conforme necessário
 
@@ -90,11 +92,7 @@ def verificar_service_on(user):
         with engine.connect() as connection:
             while True:  # O loop continuará enquanto o Service_on for TRUE
                 # Verificar o valor de 'Service_on' para o usuário
-                select_query = "SELECT Service_on FROM user_print_totals WHERE User = :user"
-                result = connection.execute(text(select_query), {"user": user}).fetchone()
-
-                if result:
-                    service_on = result[0]
+                
                     if service_on:
                         print(f"O serviço está ativado para o usuário {user}. Executando ação...") 
                         
@@ -102,17 +100,17 @@ def verificar_service_on(user):
                         # Criar tabelas e processar dados
                         create_tables(DEFAULT_PRINT_LIMIT, engine)
                         insert_data_from_csv(DEFAULT_PRINT_LIMIT, engine, csv_file_path, usuario_logado)
-                        monitor_print_limit(user, usuario_logado, engine)
+                        monitor_print_limit(user, usuario_logado, engine, DEFAULT_PRINT_LIMIT)
 
                         # Verificação de reset
                         zera.run(engine)
+                        
+                        time (100)
 
                     else:
                         print(f"O serviço foi desativado para o usuário {user}. Saindo...")
                         break  # Sai do loop se Service_on for FALSE
 
-                # Aguarda 1 segundos antes de verificar novamente
-                time.sleep(100)
 
     except Exception as e:
         print(f"Erro ao verificar 'Service_on' para o usuário {user}: {e}")
