@@ -18,7 +18,7 @@ def monitor_print_limit(user, usuario_logado, engine, DEFAULT_PRINT_LIMIT):
                 u.PrintLimit, 
                 u.Blocked
             FROM 
-                user_print_totals u
+                users u
             JOIN 
                 logs l ON u.User = l.User
             WHERE 
@@ -39,19 +39,23 @@ def monitor_print_limit(user, usuario_logado, engine, DEFAULT_PRINT_LIMIT):
                 # Desempacotando os resultados da consulta
                 user, total_pages, print_limit, blocked = result
 
-                print(f"TotalPages: {total_pages}, PrintLimit: {print_limit}, Blocked: {blocked}")
+                print(
+                    f"TotalPages: {total_pages}, PrintLimit: {print_limit}, Blocked: {blocked}"
+                )
 
             # Atualiza os totais independentemente de haver resultado na consulta ou não
             update_user_totals(user, total_pages, DEFAULT_PRINT_LIMIT, engine)
 
             if total_pages >= print_limit:
-                print(f"Usuário {user} atingiu o limite de impressão ou já está bloqueado.")
+                print(
+                    f"Usuário {user} atingiu o limite de impressão ou já está bloqueado."
+                )
                 stop_spooler_service_if_needed(user, usuario_logado)
             else:
                 print(f"Usuário {user} ainda não atingiu o limite de impressão.")
                 # Atualizar a coluna 'Blocked' para 0
                 update_query = """
-                    UPDATE user_print_totals
+                    UPDATE users
                     SET Blocked = 0
                     WHERE User = :user
                     """
@@ -61,7 +65,9 @@ def monitor_print_limit(user, usuario_logado, engine, DEFAULT_PRINT_LIMIT):
                 subprocess.run(
                     ["sc", "start", "PCPrintLogger"], check=True, text=True, shell=True
                 )
-                print(f"Serviço 'PCPrintLogger' iniciado com sucesso para o usuário {user}.")
+                print(
+                    f"Serviço 'PCPrintLogger' iniciado com sucesso para o usuário {user}."
+                )
 
     except Exception as e:
         print(f"Erro ao verificar ou desbloquear o usuário {user}: {e}")

@@ -8,6 +8,7 @@ from block import monitor_print_limit
 from create_tables import create_tables
 from carrega_csv import insert_data_from_csv
 import wmi
+from atualiza_user import updade_user_department
 
 # URL de conexão com o banco
 db_url = "mysql+pymysql://admin_user:admsysp%4025@192.168.1.226:3306/sysprint"
@@ -40,6 +41,7 @@ def get_logged_in_user():
     except Exception as e:
         print(f"Erro ao obter o usuário ativo: {e}")
         return None
+
 
 # Para o serviço de spooler e verifica o
 def stop_spooler_service_if_needed(user):
@@ -84,34 +86,41 @@ def stop_spooler_service_if_needed(user):
             f"Usuário {user} atingiu o limite, mas não está logado. O Spooler continuará funcionando."
         )
 
+
 def verificar_service_on(user):
     """Verifica o status da coluna 'Service_on' para o usuário e executa ações se for TRUE."""
     try:
-            while True:  # O loop continuará enquanto o Service_on for TRUE
-                # Verificar o valor de 'Service_on' para o usuário
-                    service_on = True
-                    if service_on:
-                        print(f"O serviço está ativado para o usuário {user}. Executando ação...") 
-                        
-                        usuario_logado = get_logged_in_user()
-                        # Criar tabelas e processar dados
-                        create_tables(DEFAULT_PRINT_LIMIT, engine)
-                        insert_data_from_csv(DEFAULT_PRINT_LIMIT, engine, csv_file_path, usuario_logado)
-                        monitor_print_limit(user, usuario_logado, engine, DEFAULT_PRINT_LIMIT)
-                        
-                        # Verificação de reset
-                        zera.run(engine)
-                        
-                        # Pausa a execução por 100 segundos antes de repetir a verificação
-                        time.sleep(100)
+        while True:  # O loop continuará enquanto o Service_on for TRUE
+            # Verificar o valor de 'Service_on' para o usuário
+            service_on = True
+            if service_on:
+                print(
+                    f"O serviço está ativado para o usuário {user}. Executando ação..."
+                )
 
-                    else:
-                        print(f"O serviço foi desativado para o usuário {user}. Saindo...")
-                        break  # Sai do loop se Service_on for FALSE
+                usuario_logado = get_logged_in_user()
+                # Criar tabelas e processar dados
+                create_tables(DEFAULT_PRINT_LIMIT, engine)
+                insert_data_from_csv(
+                    DEFAULT_PRINT_LIMIT, engine, csv_file_path, usuario_logado
+                )
+                monitor_print_limit(user, usuario_logado, engine, DEFAULT_PRINT_LIMIT)
 
+                with engine.connect() as connection:
+                    updade_user_department(connection)
+
+                # Verificação de reset
+                zera.run(engine)
+
+                # Pausa a execução por 100 segundos antes de repetir a verificação
+                time.sleep(100)
+
+            else:
+                print(f"O serviço foi desativado para o usuário {user}. Saindo...")
+                break  # Sai do loop se Service_on for FALSE
 
     except Exception as e:
         print(f"Erro ao verificar 'Service_on' para o usuário {user}: {e}")
-        
-verificar_service_on(get_logged_in_user())
 
+
+verificar_service_on(get_logged_in_user())

@@ -2,14 +2,16 @@ from sqlalchemy import text
 
 
 def update_user_totals(user, pages, DEFAULT_PRINT_LIMIT, engine):
-    """Atualiza a tabela 'user_print_totals' com os totais de páginas por usuário e verifica o limite de impressão."""
+    """Atualiza a tabela 'users' com os totais de páginas por usuário e verifica o limite de impressão."""
     try:
         with engine.connect() as connection:
             # Iniciar transação
             transaction = connection.begin()
 
             # Verificar se o usuário já existe na tabela
-            select_query = "SELECT TotalPages, PrintLimit, Blocked FROM user_print_totals WHERE User = :user"
+            select_query = (
+                "SELECT TotalPages, PrintLimit, Blocked FROM users WHERE User = :user"
+            )
             result = connection.execute(text(select_query), {"user": user}).fetchone()
 
             if result:
@@ -17,7 +19,9 @@ def update_user_totals(user, pages, DEFAULT_PRINT_LIMIT, engine):
                 new_total = pages
 
                 # Caso o limite não tenha sido alcançado, só atualiza o total de páginas
-                update_query = "UPDATE user_print_totals SET TotalPages = :new_total WHERE User = :user"
+                update_query = (
+                    "UPDATE users SET TotalPages = :new_total WHERE User = :user"
+                )
                 connection.execute(
                     text(update_query), {"new_total": new_total, "user": user}
                 )
@@ -26,7 +30,7 @@ def update_user_totals(user, pages, DEFAULT_PRINT_LIMIT, engine):
             else:
                 # Se o usuário não existir, inserir um novo registro com o limite de impressão e service_on = 0
                 insert_query = """
-                INSERT INTO user_print_totals (User, TotalPages, PrintLimit, Blocked) 
+                INSERT INTO users (User, TotalPages, PrintLimit, Blocked) 
                 VALUES (:user, :pages, :print_limit, FALSE)
                 """
                 connection.execute(
@@ -41,3 +45,20 @@ def update_user_totals(user, pages, DEFAULT_PRINT_LIMIT, engine):
             transaction.commit()
     except Exception as e:
         print(f"Erro ao atualizar os totais de páginas para o usuário {user}: {e}")
+
+
+def updade_user_department(connection):
+    """Atualiza o campo 'Department' (tabela 'users') conforme o campo 'Client' (tabela 'logs')"""
+    try:
+        update_department_query = """
+        UPDATE users AS u
+        JOIN logs AS l ON u.User = l.User
+        SET u.Department = CASE
+            WHEN l.Client LIKE '%TI%' THEN 'TI'
+            ELSE 'Unknown'
+        END;
+        """
+        connection.execute(text(update_department_query))
+        print("Departamentos atualizados.")
+    except Exception as e:
+        print(f"Erro ao atualizar departamentos: {e}.")
