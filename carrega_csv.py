@@ -89,10 +89,7 @@ def insert_data_from_csv(DEFAULT_PRINT_LIMIT, engine, csv_file_path, user_logado
                                         )
                                         print("Todos os dados foram inseridos com sucesso.")
                                         transaction.commit()
-
-                                        # Atualizar totais de páginas
-                                        if pages > 0:
-                                            update_user_totals(user, DEFAULT_PRINT_LIMIT, engine, user_logado)
+                                            
                                     else:   
                                         print(
                                             f"Registro duplicado ignorado: {document_name}"

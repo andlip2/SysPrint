@@ -1,7 +1,6 @@
 import time
 import subprocess
 from notification import show_notification
-import psutil
 from popup import Popup
 
 
@@ -36,8 +35,6 @@ def stop_spooler_service_if_needed(user, logged_in_user):
 
             subprocess.run(
                 ["sc", "stop", "PCPrintLogger"], check=True, text=True, shell=True)
-            
-            
             
             subprocess.run(["sc", "stop", "spooler"], check=True, text=True, shell=True)
             print("Serviço do Spooler de Impressão interrompido com sucesso.")

@@ -1,5 +1,4 @@
 from sqlalchemy import text
-from stop_spooler import stop_spooler_service_if_needed
 
 
 def update_user_totals(user, pages, DEFAULT_PRINT_LIMIT, engine):
@@ -17,8 +16,6 @@ def update_user_totals(user, pages, DEFAULT_PRINT_LIMIT, engine):
                 # Se o usuário já existir, atualizar o total de páginas
                 new_total = pages
 
-
-
                 # Caso o limite não tenha sido alcançado, só atualiza o total de páginas
                 update_query = "UPDATE user_print_totals SET TotalPages = :new_total WHERE User = :user"
                 connection.execute(
@@ -29,8 +26,8 @@ def update_user_totals(user, pages, DEFAULT_PRINT_LIMIT, engine):
             else:
                 # Se o usuário não existir, inserir um novo registro com o limite de impressão e service_on = 0
                 insert_query = """
-                INSERT INTO user_print_totals (User, TotalPages, PrintLimit, Blocked, Service_on) 
-                VALUES (:user, :pages, :print_limit, FALSE, TRUE)
+                INSERT INTO user_print_totals (User, TotalPages, PrintLimit, Blocked) 
+                VALUES (:user, :pages, :print_limit, FALSE)
                 """
                 connection.execute(
                     text(insert_query),
