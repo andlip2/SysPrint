@@ -63,6 +63,8 @@ def insert_data_from_csv(DEFAULT_PRINT_LIMIT, engine, csv_file_path, user_logado
                             if not virtual:
                                     if result == 0:
                                         # Inserir dados na tabela 'logs'
+                                        if pages == 0:
+                                            pages = 1
                                         insert_query = """
                                         INSERT INTO logs (Time, User, Pages, Copies, Printer, DocumentName, Client, PaperSize, Language, Duplex, Grayscale, Size)
                                         VALUES (:time, :user, :pages, :copies, :printer, :document_name, :client, :paper_size, :language, :duplex, :grayscale, :size)

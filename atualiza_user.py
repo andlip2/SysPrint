@@ -1,7 +1,7 @@
 from sqlalchemy import text
 
 
-def update_user_totals(user, pages, DEFAULT_PRINT_LIMIT, engine):
+def update_user_totals(user, pages, DEFAULT_PRINT_LIMIT, engine, departamento):
     """Atualiza a tabela 'users' com os totais de páginas por usuário e verifica o limite de impressão."""
     try:
         with engine.connect() as connection:
@@ -30,15 +30,15 @@ def update_user_totals(user, pages, DEFAULT_PRINT_LIMIT, engine):
             else:
                 # Se o usuário não existir, inserir um novo registro com o limite de impressão e service_on = 0
                 insert_query = """
-                INSERT INTO users (User, TotalPages, PrintLimit, Blocked) 
-                VALUES (:user, :pages, :print_limit, FALSE)
+                INSERT INTO users (User, TotalPages, PrintLimit, Blocked, Department) 
+                VALUES (:user, :pages, :print_limit, FALSE, :department)
                 """
                 connection.execute(
                     text(insert_query),
-                    {"user": user, "pages": pages, "print_limit": DEFAULT_PRINT_LIMIT},
+                    {"user": user, "pages": pages, "print_limit": DEFAULT_PRINT_LIMIT, "department": departamento},
                 )
                 print(
-                    f"Novo registro inserido para {user}: {pages} páginas, Limite de impressão: {DEFAULT_PRINT_LIMIT} páginas, Service_on: 0."
+                    f"Novo registro inserido para {user}: {pages} páginas, Limite de impressão: {DEFAULT_PRINT_LIMIT} páginas departamento: {departamento}."
                 )
 
             # Commit da transação
@@ -47,18 +47,4 @@ def update_user_totals(user, pages, DEFAULT_PRINT_LIMIT, engine):
         print(f"Erro ao atualizar os totais de páginas para o usuário {user}: {e}")
 
 
-def updade_user_department(connection):
-    """Atualiza o campo 'Department' (tabela 'users') conforme o campo 'Client' (tabela 'logs')"""
-    try:
-        update_department_query = """
-        UPDATE users AS u
-        JOIN logs AS l ON u.User = l.User
-        SET u.Department = CASE
-            WHEN l.Client LIKE '%TI%' THEN 'TI'
-            ELSE 'Unknown'
-        END;
-        """
-        connection.execute(text(update_department_query))
-        print("Departamentos atualizados.")
-    except Exception as e:
-        print(f"Erro ao atualizar departamentos: {e}.")
+
