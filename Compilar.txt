@@ -1,1 +1,3 @@
 pyinstaller --onefile --noconsole --collect-all win10toast main.py
+
+

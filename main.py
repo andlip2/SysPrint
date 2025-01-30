@@ -65,7 +65,7 @@ def verificar_service_on(user):
                 monitor_print_limit(user, usuario_logado, engine, DEFAULT_PRINT_LIMIT, departamento)
 
                 # Pausa a execução por 1 segundos antes de repetir a verificação
-                time.sleep(10)
+                time.sleep(1)
 
             else:
                 print(f"O serviço foi desativado para o usuário {user}. Saindo...")

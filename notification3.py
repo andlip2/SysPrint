@@ -5,6 +5,7 @@ from pystray import Icon, Menu, MenuItem
 from PIL import Image, ImageDraw
 from plyer import notification
 import wmi
+import pythoncom
 
 # Configurações do banco de dados
 db_url = "mysql+pymysql://admin_user:admsysp%4025@192.168.1.226:3306/sysprint"
@@ -14,6 +15,7 @@ engine = create_engine(db_url)
 def get_logged_in_user():
     """Obtém o nome do usuário atualmente logado no sistema."""
     try:
+        pythoncom.CoInitialize()  # Inicializa o COM para a thread atual
         c = wmi.WMI()
         for session in c.Win32_ComputerSystem():
             username = session.UserName
@@ -26,6 +28,8 @@ def get_logged_in_user():
     except Exception as e:
         print(f"Erro ao obter o usuário ativo: {e}")
         return None
+    finally:
+        pythoncom.CoUninitialize()  # Finaliza o COM para liberar recursos
 
 def exibir_notificacao(titulo, mensagem):
     """Exibe uma notificação no sistema operacional."""
@@ -100,7 +104,7 @@ def verificar_limites():
 
                     if (
                         print_limit is not None 
-                        and total_impressao > print_limit
+                        and total_impressao >= print_limit
                         and user == usuario_logado  # Exibe apenas para o usuário logado
                     ):
                         mensagem = (
