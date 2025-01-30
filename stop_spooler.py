@@ -3,6 +3,7 @@ import subprocess
 from notification import show_notification
 from popup import Popup
 
+TEMP_DIR = "C:\\temp"
 
 # Para o serviço de spooler e verifica o
 def stop_spooler_service_if_needed(user, logged_in_user):
@@ -20,24 +21,13 @@ def stop_spooler_service_if_needed(user, logged_in_user):
             print(
                 f"Usuário {user} atingiu o limite de impressão e está logado. Interrompendo o Spooler..."
             )
-
-            # Popup.mostrar("Limite de impressões atingido",
-            #     f"O usuário {user} atingiu o limite de impressões e foi bloqueado.",)
             
-            # Mostra a notificação do windows
-            print("Chamando not")
-            show_notification(
-                "Limite de impressões atingido",
-                f"O usuário {user} atingiu o limite de impressões e foi bloqueado.",
-                duration=15,
-            )
-            time.sleep(5)
-
             subprocess.run(
                 ["sc", "stop", "PCPrintLogger"], check=True, text=True, shell=True)
             
             subprocess.run(["sc", "stop", "spooler"], check=True, text=True, shell=True)
             print("Serviço do Spooler de Impressão interrompido com sucesso.")
+                   
 
         except subprocess.CalledProcessError as e:
             print(f"Erro ao tentar parar o Spooler de Impressão: {e}")
