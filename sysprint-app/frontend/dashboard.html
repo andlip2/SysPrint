@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SysPrint - Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="navbar">
+        <ul>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="users.html">Controle de Usuários</a></li>
+            <li><a href="database.html">Banco de Dados</a></li>
+            <li><a href="printers.html"></a></li>
+        </ul>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="dashboard-container">
+        <h2>Dashboard</h2>
+        <div id="charts-container">
+            <canvas id="impressionsChart" width="400" height="200"></canvas>
+            <canvas id="sectorChart" width="400" height="200"></canvas>
+        </div>
+        <button onclick="logout()">Sair</button>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+
+</html>
