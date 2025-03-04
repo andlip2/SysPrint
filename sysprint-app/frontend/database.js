@@ -1,38 +1,22 @@
-async function fetchDatabaseTables() {
+async function fetchUsersData() {
     try {
-        const response = await fetch("http://127.0.0.1:5000/dashboard-data");
-        const data = await response.json(); 
-        console.log(data);
-
-        renderBarChart(data);
+        const response = await fetch("http://127.0.0.1:5000/get-users");
+        const data = await response.json();  // Dados que vêm com as chaves 'id', 'name' e 'email'
+        renderUsersTable(data);
     } catch (error) {
-        console.error("Erro ao carregar dados do dashboard", error);
+        console.error("Erro ao carregar os dados da tabela de usuários:", error);
     }
 }
 
-function renderBarChart(data) {
-    const tableBody = document.querySelector(.'styled-table tbody')
+function renderUsersTable(data) {
+    const table = document.getElementById('users');
+    table.innerHTML = '';  // Limpa a tabela antes de adicionar os novos dados
 
-    tableBody.innerHTML = ''
-
-    data.tables.forEach(table => {
-        // Linhas
+    data.forEach(users => {
         const row = document.createElement('tr');
-
-        // Células
-        const tableCell = document.createElement('td');
-        tableCell.textContent = table.name;
-
-        const descriptionCell = document.createElement('td');
-        descriptionCell.textContent = table.description;
-
-        // Adição de células nas linhas
-        row.appendChild(tableCell);
-        row.appendChild(descriptionCell);
-
-        // Adição de linha ao corpo da tabela
-        tableBody.appendChild(row);
+        row.innerHTML = `
+            <td>${users.User}</td>   <!-- Exibindo a coluna id -->
+        `;
+        table.appendChild(row);  // Adiciona a linha na tabela
     });
 }
-
-fetchDatabaseTables();
