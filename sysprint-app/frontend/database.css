@@ -1,0 +1,33 @@
+.database-container {
+    margin-top: 60px;
+    padding: 20px;
+    text-align: center;
+    width: 90%;
+    max-width: 900px;
+    overflow: hidden;
+}
+
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.styled-table th,
+.styled-table td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.styled-table th {
+    background-color: #333;
+    color: white;
+}
+
+.styled-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}

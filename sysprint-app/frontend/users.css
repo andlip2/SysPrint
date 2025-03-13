@@ -1,0 +1,8 @@
+.users-container {
+    margin-top: 60px;
+    padding: 20px;
+    text-align: center;
+    width: 90%;
+    max-width: 900px;
+    overflow: hidden;
+}
