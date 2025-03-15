@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="database.css">
     <title>Exibir Tabela de Usuários</title>
-    <script src="database.js"></script>
 </head>
-
 <body>
+
+    <!-- Navbar -->
     <div class="navbar">
         <ul>
             <li><a href="dashboard.html">Dashboard</a></li>
@@ -20,7 +19,17 @@
         </ul>
     </div>
 
-    <div class="database-container">
+    <!-- Dropdown -->
+    <label for="table-selector">Escolha a tabela:</label>
+    <select id="table-select" onchange="changeTable()">
+        <option value="users">Usuários</option>
+        <option value="logs">Logs</option>
+        <option value="printers">Impressoras</option>
+        <option value="departments">Departamentos</option>
+    </select>
+
+    <!-- Tabela de usuários -->
+    <div id="users-table-container">
         <h2>Usuários</h2>
         <div class="styled-table">        
             <table id="users-table">
@@ -33,12 +42,70 @@
                         <th>Departamento</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <!-- Espaço para as linhas da tabela -->
-                </tbody>
+                <tbody></tbody>
             </table>
         </div>
+    </div>
 
+    <!-- Tabela de logs -->
+    <div id="logs-table-container" style="display: none;">
+        <h2>Logs</h2>
+        <div class="styled-table">
+            <table id="logs-table">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Usuário</th>
+                        <th>Páginas</th>
+                        <th>Cópias</th>
+                        <th>Impressora</th>
+                        <th>Arquivo</th>
+                        <th>Client</th>
+                        <th>Tamanho papel</th>
+                        <th>Linguagem</th>
+                        <th>Duplex</th>
+                        <th>Escala de cinza</th>
+                        <th>Tamanho</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Tabela de impressoras -->
+     <div id="printers-table-container" style="display: none;">
+        <h2>Impressoras</h2>
+        <div class="styled-table">
+            <table id="printers-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Num. Série</th>
+                        <th>Modelo</th>
+                        <th>Departamento</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+     </div>
+
+     <!-- Tabela de departamentos -->
+      <div id="departments-table-container" style="display: none;">
+        <h2>Departamentos</h2>
+        <div class="styled-table">
+            <table id="departments-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+      </div>
+    <script src="database.js" defer></script>
 </body>
-
 </html>
