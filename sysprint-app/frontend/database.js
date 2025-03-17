@@ -1,15 +1,16 @@
-// Troca de tabelas
+// Dropdown (troca de tabelas)
 function changeTable() {
     const tableSelect = document.getElementById("table-select");
     const selectedTable = tableSelect.value;
 
     console.log("Tabela selecionada:", selectedTable);
 
-    // Esconde todas as tabelas primeiro
+    // Esconde todas as tabelas para que o dropdown funcione
     document.getElementById("users-table-container").style.display = "none";
     document.getElementById("logs-table-container").style.display = "none";
     document.getElementById("printers-table-container").style.display = "none";
     document.getElementById("departments-table-container").style.display = "none";
+    document.getElementById("scans-table-container").style.display = "none";
 
     // Mostra apenas a tabela selecionada
     if (selectedTable === "users") {
@@ -24,8 +25,12 @@ function changeTable() {
     } else if (selectedTable === "departments") {
         document.getElementById("departments-table-container").style.display = "block";
         fetchDepartmentsData();
+    } else if (selectedTable === "scans") {
+        document.getElementById("scans-table-container").style.display = "block";
+        fetchScansData();
     }
 }
+
 
 // Tabela de usuários
 async function fetchUsersData() {
@@ -52,6 +57,7 @@ function renderUsersTable(data) {
         row.insertCell(4).textContent = user.department;
     });
 }
+
 
 // Tabela de logs
 async function fetchLogsData() {
@@ -86,6 +92,7 @@ function renderLogsTable(data) {
     });
 }
 
+
 // Tabela de impressoras
 async function fetchPrintersData() {
     try {
@@ -111,6 +118,7 @@ function renderPrintersTable(data) {
     });
 }
 
+
 // Tabela de departamentos
 async function fetchDepartmentsData() {
     try {
@@ -131,6 +139,32 @@ function renderDepartmentsTable(data) {
         const row = tableBody.insertRow();
         row.insertCell(0).textContent = departments.id_departamento;
         row.insertCell(1).textContent = departments.nome;
+    });
+}
+
+// Tabela de scans
+async function fetchScansData() {
+    try {
+        const response = await fetch("http://127.0.0.1:5000/scans-data")
+        const data = await response.json();
+        console.log("Dados recebidos:", data);
+        renderScansTable(data);
+    } catch (error) {
+        console.error("Erro ao carregar os dados da tabela de scans:", error);
+    }
+}
+
+function renderScansTable(data) {
+    const tableBody = document.querySelector("#scans-table tbody")
+    tableBody.innerHTML = '';
+
+    data.forEach(scans => {
+        const row = tableBody.insertRow();
+        row.insertCell(0).textContent = scans.id_impressora;
+        row.insertCell(1).textContent = scans.num_serie;
+        row.insertCell(2).textContent = scans.modelo;
+        row.insertCell(3).textContent = scans.copias;
+        row.insertCell(4).textContent = scans.impressoes;
     });
 }
 

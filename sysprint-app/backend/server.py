@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
-from sqlalchemy import create_engine, table, text
+from sqlalchemy import create_engine, text
+
 
 app = Flask(__name__)
 
@@ -207,6 +208,37 @@ def get_departments_data():
             ]
 
         return jsonify(departments)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# Tabela de scans
+@app.route("/scans-data", methods=["GET"])
+def get_scans_data():
+    try:
+        with engine.connect() as connection:
+            query = text(
+                """
+                SELECT id_impressora, num_serie, modelo, copias, impressoes
+                FROM scans
+                """
+            )
+            result = connection.execute(query)
+            data = result.fetchall()
+
+            scans = [
+                {
+                    "id_impressora": row[0],
+                    "num_serie": row[1],
+                    "modelo": row[2],
+                    "copias": row[3],
+                    "impressoes": row[4],
+                }
+                for row in data
+            ]
+
+        return jsonify(scans)
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500

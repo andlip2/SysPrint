@@ -15,7 +15,7 @@
             <li><a href="dashboard.html">Dashboard</a></li>
             <li><a href="users.html">Controle de Usuários</a></li>
             <li><a href="database.html">Banco de Dados</a></li>
-            <li><a href="printers.html"></a></li>
+            <li><a href="printers.html">Impressoras</a></li>
         </ul>
     </div>
 
@@ -26,6 +26,7 @@
         <option value="logs">Logs</option>
         <option value="printers">Impressoras</option>
         <option value="departments">Departamentos</option>
+        <option value="scans">Scans</option>
     </select>
 
     <!-- Tabela de usuários -->
@@ -106,6 +107,25 @@
             </table>
         </div>
       </div>
+
+      <!-- Tabela de scans -->
+       <div id="scans-table-container" style="display: none;">
+        <h2>Scans</h2>
+        <div class="styled-table">
+            <table id="scans-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Num. Série</th>
+                        <th>Modelo</th>
+                        <th>Cópias</th>
+                        <th>Impressões</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+       </div>
     <script src="database.js" defer></script>
 </body>
 </html>
