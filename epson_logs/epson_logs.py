@@ -1,10 +1,51 @@
 import csv
 import time
+import mysql.connector
 from playwright.sync_api import sync_playwright
 
 
+def db_upload(data):
+    """Conexão com o banco"""
+    try:
+        conn = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="sysprintdb",
+            database="sysprint",
+        )
+        cursor = conn.cursor()
+
+        """ Inserção na tabela 'logs_scans' """
+        cursor.execute(
+            """
+        INSERT INTO logs_scans (time, printer_name, ip, serial_num, bw_copies, colorful_copies)
+        VALUES (%s, %s, %s, %s, %s, %s)
+        """,
+            data,
+        )
+
+        conn.commit()
+    except mysql.connector.Error as e:
+        print(f"Erro ao inserir no banco de dados: {e}")
+    finally:
+        conn.close()
+
+
+def read_csv():
+    """Lê o CSV e adiciona os dados ao banco"""
+    with open("epson_logs/logs_epson.csv", mode="r", encoding="utf-8-sig") as file:
+        reader = csv.reader(file)
+        next(reader)
+
+        for row in reader:
+            db_upload(row)
+
+
 def csv_generator(data):
-    with open("epson_logs/logs_epson.csv", mode="a", newline="") as file:
+    """Recebe os dados copiados das interfaces e os parâmetros passados na lista 'printers'"""
+    with open(
+        "epson_logs/logs_epson.csv", mode="a", newline="", encoding="utf-8-sig"
+    ) as file:
         writer = csv.writer(file)
         if file.tell() == 0:
             writer.writerow(
@@ -14,6 +55,7 @@ def csv_generator(data):
 
 
 def go_to_interface(page, ip, printer_name):
+    """Navega pelas interfaces e copia os dados necessários"""
     page.goto(f"http://{ip}")
 
     page.get_by_text("Início de sessão de administrador").click()
@@ -72,6 +114,7 @@ def go_to_interface(page, ip, printer_name):
 
 
 def collect_data():
+    """Configura a navegação e passa parâmetros dentro de 'printers'"""
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=False, slow_mo=500)
         context = browser.new_context()
@@ -85,11 +128,11 @@ def collect_data():
         for ip, printer_name in printers:
             go_to_interface(page, ip, printer_name)
 
-        input()
-
         browser.close()
 
 
+""" Chama as funções """
 collect_data()
 
-ler_csv_e_inserir_no_bd()
+
+read_csv()
