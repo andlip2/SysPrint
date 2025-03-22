@@ -44,7 +44,7 @@ def read_csv():
 def csv_generator(data):
     """Recebe os dados copiados das interfaces e os parâmetros passados na lista 'printers'"""
     with open(
-        "epson_logs/logs_epson.csv", mode="a", newline="", encoding="utf-8-sig"
+        "epson_logs/logs_epson.csv", mode="w", newline="", encoding="utf-8-sig"
     ) as file:
         writer = csv.writer(file)
         if file.tell() == 0:

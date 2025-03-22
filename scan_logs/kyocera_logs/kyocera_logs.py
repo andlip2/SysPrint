@@ -1,0 +1,137 @@
+import os
+import csv
+import glob
+import datetime
+import mysql.connector
+from playwright.sync_api import sync_playwright
+
+
+def collect_data():
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=False, slow_mo=500)
+
+        download_path = (
+            "C:/Users/ana.beatriz/Documents/Ana/Projetos/"
+            "SysPrint/scan_logs/kyocera_logs"
+        )
+
+        # Criar um contexto do navegador com suporte a downloads
+        context = browser.new_context(accept_downloads=True)
+        page = context.new_page()
+
+        page.goto("https://localhost:9292/")
+
+        page.get_by_text("Relatórios", exact=True).click()
+
+        page.locator("div.ui-grid-cell-contents span.ng-binding", has_text="Data").nth(
+            1
+        ).click()
+        page.locator("div.ui-grid-cell-contents span.ng-binding", has_text="Data").nth(
+            1
+        ).click()
+
+        page.locator(
+            "div.ui-grid-cell-contents.ng-binding.ng-scope", has_text="scans_kyocera"
+        ).nth(1).click()
+
+        with page.expect_download() as download_info:
+            page.locator(
+                "div.row.ndm-toolbar-text.ndm-no-highlight.ng-binding",
+                has_text="Fazer o Download",
+            ).click()
+
+        """ div no html:
+        <div class="row ndm-toolbar-text ndm-no-highlight ng-binding">Fazer o Download</div>
+        Para usá-la no page.locator, troque os espaços por pontos. """
+
+        download = download_info.value
+        download.save_as(f"{download_path}/{download.suggested_filename}")
+
+        # input()
+
+        browser.close()
+
+
+def add_date():
+    download_path = (
+        "C:/Users/ana.beatriz/Documents/Ana/Projetos/SysPrint/scan_logs/kyocera_logs"
+    )
+    csv_files = glob.glob(f"{download_path}/*.csv")
+    latest_file = max(csv_files, key=os.path.getctime)
+
+    output_file = latest_file.replace(".csv", "_edited.csv")
+
+    current_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    with open(latest_file, "r", encoding="utf-8-sig") as infile, open(
+        output_file, "w", encoding="utf-8-sig", newline=""
+    ) as outfile:
+        reader = csv.reader(infile)
+        writer = csv.writer(outfile)
+
+        headers = next(reader)
+        headers.insert(0, "Data")  # Posição 0 para que a data seja o primeiro elemento
+        writer.writerow(headers)
+
+        for row in reader:
+            row.insert(0, current_date)
+            writer.writerow(row)
+
+
+def db_upload(data):
+    """Conexão com o banco"""
+    try:
+        conn = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="sysprintdb",
+            database="sysprint",
+        )
+        cursor = conn.cursor()
+
+        """ Inserção na tabela 'logs_scans' """
+        query = """ INSERT INTO logs_scans (time, printer_name, ip, serial_num, bw_copies)
+        VALUES (%s, %s, %s, %s, %s) """
+
+        cursor.execute(query, data)
+
+        conn.commit()
+    except mysql.connector.Error as e:
+        print(f"Erro ao inserir no banco de dados: {e}")
+    finally:
+        conn.close()
+
+
+def read_csv():
+    """Lê o CSV e adiciona os dados ao banco"""
+    download_path = (
+        "C:/Users/ana.beatriz/Documents/Ana/Projetos/SysPrint/scan_logs/kyocera_logs"
+    )
+    csv_files = glob.glob(f"{download_path}/*.csv")
+    latest_file = max(csv_files, key=os.path.getctime)
+
+    with open(latest_file, mode="r", encoding="utf-8-sig") as file:
+        reader = csv.reader(file)
+        next(reader)
+
+        for row in reader:
+            try:
+                bw_copies = int(row[4])
+            except ValueError:
+                bw_copies = 0
+
+            data = (
+                row[0],
+                row[3],
+                row[1],
+                row[2],
+                bw_copies,
+            )
+            db_upload(data)
+
+
+collect_data()
+
+add_date()
+
+read_csv()
