@@ -40,14 +40,8 @@ def collect_data():
                 has_text="Fazer o Download",
             ).click()
 
-        """ div no html:
-        <div class="row ndm-toolbar-text ndm-no-highlight ng-binding">Fazer o Download</div>
-        Para usá-la no page.locator, troque os espaços por pontos. """
-
         download = download_info.value
         download.save_as(f"{download_path}/{download.suggested_filename}")
-
-        # input()
 
         browser.close()
 
@@ -89,13 +83,46 @@ def db_upload(data):
         )
         cursor = conn.cursor()
 
-        """ Inserção na tabela 'logs_scans' """
-        query = """ INSERT INTO logs_scans (time, printer_name, ip, serial_num, bw_copies)
-        VALUES (%s, %s, %s, %s, %s) """
+        serial_num = data[3]  # Número de série é o 4º item na lista (index 3)
 
-        cursor.execute(query, data)
+        # Verifica se já existe um registro com o mesmo serial_num
+        cursor.execute(
+            "SELECT id_log FROM logs_scans WHERE serial_num = %s", (serial_num,)
+        )
+        existing_record = cursor.fetchone()
 
-        conn.commit()
+        print(f"Verificando existência de {serial_num}: {existing_record}")
+
+        if existing_record:
+            # Se já existe, fazemos um UPDATE
+            cursor.execute(
+                """
+                UPDATE logs_scans
+                SET time = %s, printer_name = %s, ip = %s, 
+                    bw_copies = %s
+                WHERE serial_num = %s
+                """,
+                (
+                    data[0],
+                    data[1],
+                    data[2],
+                    data[4],
+                    serial_num,
+                ),
+            )
+            print(f"Atualizando {serial_num}")
+        else:
+            # Se não existe, fazemos um INSERT
+            cursor.execute(
+                """
+                INSERT INTO logs_scans (time, printer_name, ip, serial_num, bw_copies)
+                VALUES (%s, %s, %s, %s, %s)
+                """,
+                data,
+            )
+            print(f"Inserindo {serial_num}")
+
+        conn.commit()  # Garantir que as mudanças sejam persistidas no banco
     except mysql.connector.Error as e:
         print(f"Erro ao inserir no banco de dados: {e}")
     finally:
@@ -112,7 +139,7 @@ def read_csv():
 
     with open(latest_file, mode="r", encoding="utf-8-sig") as file:
         reader = csv.reader(file)
-        next(reader)
+        next(reader)  # Pula o cabeçalho
 
         for row in reader:
             try:
