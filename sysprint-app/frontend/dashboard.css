@@ -22,7 +22,3 @@ canvas {
     max-height: 250px;
     object-fit: contain;
 }
-
-.users-container {
-    margin-top: 60px;
-}

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=0.1">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="users.css">
+    <script src="panel.js" defer></script>
     <title>SysPrint - Controle de Usuários</title>
 </head>
 
@@ -19,12 +20,13 @@
         </ul>
     </div>
 
-    <div class="users-container">
-        <h2>Cadastro de usuários</h2>
-        <p>Insira o usuário e o seu departamento:</p>
-        <input type="text" id="user-username" placeholder="Usuário">
-        <input type="text" id="user-department" placeholder="Departamento">
-
+    <div class="panel-container">
+        <h2>Painel de Controle</h2>
+        <h3>Cadastros</h3>
+        <button onclick="goToUsers()">Usuários</button>  <!-- Criar uma nova tela para cada opção e fazer com que os botões levem para elas -->
+        <button onclick="goToDepartments()">Departamentos</button>
+        <button onclick="goToPrinters()">Impressoras</button>
+        <button onclick="logout()">Sair</button>
     </div>
 </body>
 
