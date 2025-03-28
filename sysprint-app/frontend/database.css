@@ -1,33 +1,35 @@
-.database-container {
+.tables-container {
     margin-top: 60px;
     padding: 20px;
     text-align: center;
-    width: 90%;
-    max-width: 900px;
-    overflow: hidden;
+    /* width: 90%; */
+    /* max-width: 900px; */
+    /* overflow: hidden; */
 }
 
-.styled-table {
+/* .styled-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
     border-radius: 8px;
     overflow: hidden;
-}
+} */
 
 .styled-table th,
 .styled-table td {
-    padding: 12px;
+    padding: 10px;
     text-align: left;
     border: 1px solid #ddd;
-    border-radius: 5px;
+    /* border-radius: 5px; */
 }
 
+/* Cores do cabeçalho*/
 .styled-table th {
     background-color: #333;
     color: white;
 }
 
+/* Cores alternadas para cada linha das tabelas */
 .styled-table tr:nth-child(even) {
     background-color: #f2f2f2;
 }

@@ -2,10 +2,14 @@
     height: 100vh;
 } */
 
-.panel-container {
+.users-container {
     margin-top: 60px;
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center
+}
+
+#user-department {
+    margin-top: 10px;
 }

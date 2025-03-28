@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.1">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="printers.css">
+    <script src="" defer></script>
+    <title>SysPrint - Impressoras</title>
+</head>
+
+<body>
+    <div class="navbar">
+        <ul>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="database.html">Banco de Dados</a></li>
+            <li><a href="panel.html">Painel de Controle</a></li>
+        </ul>
+    </div>
+
+    <div class="printers-container">
+        <h2>Cadastro de impressoras</h2>
+        <p>Preencha as informações contendo a marca, modelo e IP da impressora:</p>
+
+        <div class="printer-form">
+            <label for="printers-brand">Marca</label>
+            <select id="printers-brand">
+                <option value="" disabled selected hidden>Selecione uma marca</option>
+                <option value="brother">Brother</option>
+                <option value="epson">Epson</option>
+                <option value="kyocera">Kyocera</option>
+            </select>
+
+            <label for="printers-model">Modelo</label>
+            <select id="printers-model">
+                <option value="" disabled selected hidden>Selecione um modelo</option>
+            </select>
+            
+            <label for="printers-ip">IP</label>
+            <input type="text" id="printerS-ip" placeholder="Digite o IP da impressora">
+            
+            <button onclick="addDepartment()">Adicionar</button>
+        </div>
+    </div>
+
+
+
+        <!-- <input type="text" id="department-printer-name" placeholder="Marca"> -->
+        <!-- <input type="text" id="department-printer-ip" placeholder="Modelo"> -->
+
+</body>
+
+</html>

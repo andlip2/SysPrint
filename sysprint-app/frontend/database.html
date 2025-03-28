@@ -13,14 +13,14 @@
     <div class="navbar">
         <ul>
             <li><a href="dashboard.html">Dashboard</a></li>
-            <li><a href="users.html">Controle de Usuários</a></li>
             <li><a href="database.html">Banco de Dados</a></li>
-            <li><a href="printers.html">Impressoras</a></li>
+            <li><a href="panel.html">Painel de Controle</a></li>
         </ul>
     </div>
 
+    <div class="tables-container">
     <!-- Dropdown -->
-    <label for="table-selector">Escolha a tabela:</label>
+    <label for="table-selector">Selecione uma tabela:</label>
     <select id="table-select" onchange="changeTable()">
         <option value="users">Usuários</option>
         <option value="logs">Logs</option>
@@ -75,7 +75,7 @@
     </div>
 
     <!-- Tabela de impressoras -->
-     <div id="printers-table-container" style="display: none;">
+    <div id="printers-table-container" style="display: none;">
         <h2>Impressoras</h2>
         <div class="styled-table">
             <table id="printers-table">
@@ -126,6 +126,9 @@
             </table>
         </div>
        </div>
+
+    </div>
+
     <script src="database.js" defer></script>
 </body>
 </html>
