@@ -3,6 +3,9 @@ Logs/
 testes/
 __pycache__/
 *.log
+*.csv
+*.txt
+*.spec
 .DS_Store
 Thumbs.db
 node_modules/

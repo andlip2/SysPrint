@@ -5,6 +5,10 @@ import datetime
 import mysql.connector
 from playwright.sync_api import sync_playwright
 
+os.environ["PLAYWRIGHT_BROWSERS_PATH"] = os.path.join(
+    os.path.dirname(__file__), "browsers"
+)
+
 
 def collect_data():
     with sync_playwright() as p:
@@ -87,7 +91,7 @@ def db_upload(data):
 
         # Verifica se já existe um registro com o mesmo serial_num
         cursor.execute(
-            "SELECT id_log FROM logs_scans WHERE serial_num = %s", (serial_num,)
+            "SELECT id_log FROM logs_scans WHERE serial_num = %s", (serial_num)
         )
         existing_record = cursor.fetchone()
 
