@@ -1,14 +1,9 @@
 import os
 import csv
-import servicemanager
 import time
 import datetime
 import mysql.connector
 from playwright.sync_api import sync_playwright
-
-os.environ["PLAYWRIGHT_BROWSERS_PATH"] = os.path.join(
-    os.path.dirname(__file__), "browsers"
-)
 
 # Gera um nome único para o CSV a cada execução usando um timestamp
 CSV_FILENAME = os.path.join(
@@ -31,7 +26,7 @@ def db_upload(data):
 
         # 🔍 Verifica se já existe um registro com o mesmo serial_num
         cursor.execute(
-            "SELECT id_log FROM logs_scans WHERE serial_num = %s", (serial_num)
+            "SELECT id_log FROM logs_scans WHERE serial_num = %s", serial_num
         )
         existing_record = cursor.fetchone()
         cursor.nextset()  # Garante que a consulta foi completamente processada
