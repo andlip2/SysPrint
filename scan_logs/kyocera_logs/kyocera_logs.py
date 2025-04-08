@@ -8,7 +8,7 @@ from playwright.sync_api import sync_playwright
 
 def collect_data():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False, slow_mo=500)
+        browser = p.chromium.launch(headless=True, slow_mo=500)
 
         download_path = (
             "C:/Users/ana.beatriz/Documents/Ana/Projetos/"
@@ -87,7 +87,7 @@ def db_upload(data):
 
         # Verifica se já existe um registro com o mesmo serial_num
         cursor.execute(
-            "SELECT id_log FROM logs_scans WHERE serial_num = %s", serial_num
+            "SELECT id_log FROM logs_scans WHERE serial_num = %s", (serial_num,)
         )
         existing_record = cursor.fetchone()
 
@@ -102,7 +102,13 @@ def db_upload(data):
                     bw_copies = %s
                 WHERE serial_num = %s
                 """,
-                (data[0], data[1], data[2], data[4], serial_num),
+                (
+                    data[0],
+                    data[1],
+                    data[2],
+                    data[4],
+                    serial_num,
+                ),
             )
             print(f"Atualizando {serial_num}")
         else:
@@ -152,5 +158,7 @@ def read_csv():
 
 
 collect_data()
+
 add_date()
+
 read_csv()

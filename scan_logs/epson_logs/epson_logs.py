@@ -26,7 +26,7 @@ def db_upload(data):
 
         # 🔍 Verifica se já existe um registro com o mesmo serial_num
         cursor.execute(
-            "SELECT id_log FROM logs_scans WHERE serial_num = %s", serial_num
+            "SELECT id_log FROM logs_scans WHERE serial_num = %s", (serial_num,)
         )
         existing_record = cursor.fetchone()
         cursor.nextset()  # Garante que a consulta foi completamente processada
@@ -150,7 +150,7 @@ def go_to_interface(page, ip, printer_name):
 def collect_data():
     """Configura a navegação e passa parâmetros dentro de 'printers'"""
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False, slow_mo=500)
+        browser = p.chromium.launch(headless=True, slow_mo=500)
         context = browser.new_context()
         page = context.new_page()
 
