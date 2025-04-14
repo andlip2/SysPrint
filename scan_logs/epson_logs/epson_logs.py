@@ -150,13 +150,22 @@ def go_to_interface(page, ip, printer_name):
 def collect_data():
     """Configura a navegação e passa parâmetros dentro de 'printers'"""
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True, slow_mo=500)
-        context = browser.new_context()
+        browser = p.chromium.launch(
+            headless=True,
+            slow_mo=500,
+            args=[
+                "--ignore-certificate-errors",
+                "--disable-web-security",
+                "--allow-insecure-localhost",
+            ],
+        )
+        context = browser.new_context(ignore_https_errors=True)
         page = context.new_page()
 
         printers = [
             ("192.168.2.199", "L6490 Series"),
             ("192.168.2.210", "L6490 Series"),
+            ("192.168.240.8", "L14150 Series"),
         ]
 
         for ip, printer_name in printers:
