@@ -2,9 +2,15 @@
     height: 100vh;
 } */
 
-.printers-container,
-.printer-form {
+.printers-container {
     margin-top: 60px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.printer-form {
     display: flex;
     flex-direction: column;
     align-items: center;

@@ -172,3 +172,30 @@ function renderScansTable(data) {
 window.onload = () => {
     changeTable();
 };
+
+document.querySelectorAll('.styled-table th').forEach((header, index) => {
+    header.style.cursor = 'pointer';  // Estiliza visualmente como "clicável"
+    let asc = true;
+
+    header.addEventListener('click', () => {
+        const table = header.closest('table');
+        const tbody = table.querySelector('tbody');
+        const rowsArray = Array.from(tbody.querySelectorAll('tr'));
+
+        rowsArray.sort((a, b) => {
+            const cellA = a.children[index].innerText.trim();
+            const cellB = b.children[index].innerText.trim();
+
+            const valA = isNaN(cellA) ? cellA.toLowerCase() : parseFloat(cellA);
+            const valB = isNaN(cellB) ? cellB.toLowerCase() : parseFloat(cellB);
+
+            if (valA < valB) return asc ? -1 : 1;
+            if (valA > valB) return asc ? 1 : -1;
+            return 0;
+        });
+
+        asc = !asc;
+
+        rowsArray.forEach(row => tbody.appendChild(row));
+    });
+});
